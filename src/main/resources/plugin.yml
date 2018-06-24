@@ -1,0 +1,6 @@
+name: "${project.name}"
+version: "${project.version}"
+main: nl.rutgerkok.doughworldgenerator.Startup
+author: Rutger Kok
+load: startup
+depends: [WorldGeneratorApi]
