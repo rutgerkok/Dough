@@ -129,7 +129,15 @@ public class ChunkGeneratorOverworld implements BaseChunkGenerator {
                     double d2 = adouble2[i] / this.settings.getLowerLimitScale(biome);
                     double d3 = adouble3[i] / this.settings.getUpperLimitScale(biome);
                     double d4 = (adouble1[i] / 10.0D + 1.0D) / 2.0D;
-                    double d5 = MathHelper.clampedLerp(d2, d3, d4) - d1;
+                    double d5;
+                    if (d4 < this.settings.getLowerLimitScaleWeight(biome)) {
+                        d5 = d2;
+                    } else if (d4 > this.settings.getUpperLimitScaleWeight(biome)) {
+                        d5 = d3;
+                    } else {
+                        d5 = d2 + (d3 - d2) * d4;
+                    }
+                    d5 -= d1;
 
                     if (l1 > 29) {
                         double d6 = (l1 - 29) / 3.0F;

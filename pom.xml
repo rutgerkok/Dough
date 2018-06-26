@@ -5,7 +5,7 @@
 	<groupId>nl.rutgerkok</groupId>
 	<artifactId>doughworldgenerator</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Dough World Generator</name>
+	<name>Dough</name>
 	<description>A Spigot plugin to customize the terrain shape.</description>
 	<inceptionYear>2018</inceptionYear>
 	<repositories>

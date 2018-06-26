@@ -3,11 +3,13 @@ package nl.rutgerkok.doughworldgenerator.chunkgen;
 public class MathHelper {
 
     public static double clampedLerp(double lowerBnd, double upperBnd, double slide) {
+        double returnValue;
         if (slide < 0.0D) {
-            return lowerBnd;
+            returnValue = lowerBnd;
         } else {
-            return slide > 1.0D ? upperBnd : lowerBnd + (upperBnd - lowerBnd) * slide;
+            returnValue = slide > 1.0D ? upperBnd : lowerBnd + (upperBnd - lowerBnd) * slide;
         }
+        return returnValue;
     }
 
     public static long lFloor(double value) {

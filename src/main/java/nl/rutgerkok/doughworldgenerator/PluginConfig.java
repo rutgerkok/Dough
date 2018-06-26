@@ -29,6 +29,7 @@ public final class PluginConfig {
     public final FloatProperty heightScale;
     public final FloatProperty heightVariation;
     public final FloatProperty lowerLimitScale;
+    public final FloatProperty lowerLimitScaleWeight;
     public final FloatProperty mainNoiseScaleX;
     public final FloatProperty mainNoiseScaleY;
     public final FloatProperty mainNoiseScaleZ;
@@ -36,6 +37,7 @@ public final class PluginConfig {
     public final Property<MaterialData> stoneBlock;
     public final FloatProperty stretchY;
     public final FloatProperty upperLimitScale;
+    public final FloatProperty upperLimitScaleWeight;
     public final Property<MaterialData> waterBlock;
     public final Property<Long> worldSeed;
 
@@ -56,6 +58,7 @@ public final class PluginConfig {
         heightScale = registry.getFloat(new NamespacedKey(plugin, "height_scale"), 684.412f);
         heightVariation = registry.getFloat(PropertyRegistry.HEIGHT_VARIATION, 0.1f);
         lowerLimitScale = registry.getFloat(new NamespacedKey(plugin, "lower_limit_scale"), 512);
+        lowerLimitScaleWeight = registry.getFloat(new NamespacedKey(plugin, "lower_limit_scale_weight"), 0);
         mainNoiseScaleX = registry.getFloat(new NamespacedKey(plugin, "main_noise_scale_x"), 80);
         mainNoiseScaleY = registry.getFloat(new NamespacedKey(plugin, "main_noise_scale_y"), 160);
         mainNoiseScaleZ = registry.getFloat(new NamespacedKey(plugin, "main_noise_scale_z"), 80);
@@ -63,6 +66,8 @@ public final class PluginConfig {
         stoneBlock = registry.getProperty(new NamespacedKey(plugin, "stone_block"), new MaterialData(Material.STONE));
         stretchY = registry.getFloat(new NamespacedKey(plugin, "stretch_y"), 12);
         upperLimitScale = registry.getFloat(new NamespacedKey(plugin, "upper_limit_scale"), 512);
+        upperLimitScaleWeight = registry.getFloat(new NamespacedKey(plugin, "upper_limit_scale_weight"), 1.2f);
+
     }
 
     private void readBiomeSetting(WorldRef world, ConfigurationSection config, FloatProperty property) {
@@ -93,6 +98,7 @@ public final class PluginConfig {
         readWorldSetting(world, config, heightScale);
         readBiomeSetting(world, config, heightVariation);
         readBiomeSetting(world, config, lowerLimitScale);
+        readBiomeSetting(world, config, lowerLimitScaleWeight);
         readWorldSetting(world, config, mainNoiseScaleX);
         readWorldSetting(world, config, mainNoiseScaleY);
         readWorldSetting(world, config, mainNoiseScaleZ);
@@ -100,6 +106,7 @@ public final class PluginConfig {
         readWorldMaterialSetting(world, config, stoneBlock);
         readWorldSetting(world, config, stretchY);
         readBiomeSetting(world, config, upperLimitScale);
+        readBiomeSetting(world, config, upperLimitScaleWeight);
     }
 
     private void readWorldMaterialSetting(WorldRef world, ConfigurationSection config,
@@ -152,6 +159,7 @@ public final class PluginConfig {
         writeWorldSetting(world, config, heightScale);
         writeBiomeSetting(world, config, heightVariation);
         writeBiomeSetting(world, config, lowerLimitScale);
+        writeBiomeSetting(world, config, lowerLimitScaleWeight);
         writeWorldSetting(world, config, mainNoiseScaleX);
         writeWorldSetting(world, config, mainNoiseScaleY);
         writeWorldSetting(world, config, mainNoiseScaleZ);
@@ -159,6 +167,7 @@ public final class PluginConfig {
         writeWorldMaterialSetting(world, config, stoneBlock);
         writeWorldSetting(world, config, stretchY);
         writeBiomeSetting(world, config, upperLimitScale);
+        writeBiomeSetting(world, config, upperLimitScaleWeight);
     }
 
     private void writeWorldMaterialSetting(WorldRef world, ConfigurationSection config,
