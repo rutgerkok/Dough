@@ -4,3 +4,11 @@ main: nl.rutgerkok.doughworldgenerator.Startup
 author: Rutger Kok
 load: startup
 depends: [WorldGeneratorApi]
+commands:
+  dough:
+    permission: dough.admin
+    usage: /<command> import <string>
+    description: Import a JSON string from the Customized world type.
+permissions:
+  dough.admin:
+    description: Various administrative permissions.
