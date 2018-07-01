@@ -32,7 +32,7 @@ public class Startup extends JavaPlugin {
         pluginConfig.readSettings(worldRef, config);
 
         config.getKeys(false).forEach(key -> config.set(key, null));
-        pluginConfig.writeSettings(worldRef, config.createSection(world.getName()));
+        pluginConfig.writeSettings(worldRef, config);
         try {
             config.save(file);
         } catch (IOException e) {
