@@ -1,8 +1,8 @@
 package nl.rutgerkok.doughworldgenerator.chunkgen;
 
 import org.bukkit.block.Biome;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.generator.ChunkGenerator.ChunkData;
-import org.bukkit.material.MaterialData;
 
 import nl.rutgerkok.worldgeneratorapi.BaseChunkGenerator;
 import nl.rutgerkok.worldgeneratorapi.BiomeGenerator;
@@ -15,8 +15,8 @@ public class ChunkGeneratorOverworld implements BaseChunkGenerator {
     private final NoiseGeneratorOctaves depthNoise;
     private final float[] biomeWeights;
 
-    private final MaterialData stoneBlock;
-    private final MaterialData waterBlock;
+    private final BlockData stoneBlock;
+    private final BlockData waterBlock;
 
     public ChunkGeneratorOverworld(OverworldGenSettings settings) {
         SharedSeedRandom sharedseedrandom = new SharedSeedRandom(settings.getSeed());

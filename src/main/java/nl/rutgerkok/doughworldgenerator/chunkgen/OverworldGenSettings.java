@@ -3,7 +3,7 @@ package nl.rutgerkok.doughworldgenerator.chunkgen;
 import java.util.Objects;
 
 import org.bukkit.block.Biome;
-import org.bukkit.material.MaterialData;
+import org.bukkit.block.data.BlockData;
 
 import nl.rutgerkok.doughworldgenerator.PluginConfig;
 import nl.rutgerkok.worldgeneratorapi.WorldRef;
@@ -14,8 +14,8 @@ public class OverworldGenSettings {
 
     private final FloatProperty baseHeight;
     private final FloatProperty seaLevel;
-    private final Property<MaterialData> stoneBlock;
-    private final Property<MaterialData> waterBlock;
+    private final Property<BlockData> stoneBlock;
+    private final Property<BlockData> waterBlock;
     private final WorldRef world;
     private final FloatProperty baseSize;
     private final FloatProperty biomeDepthOffset;
@@ -144,7 +144,7 @@ public class OverworldGenSettings {
         return worldSeed.get(world);
     }
 
-    public MaterialData getStoneBlock() {
+    public BlockData getStoneBlock() {
         return stoneBlock.get(world);
     }
 
@@ -161,7 +161,7 @@ public class OverworldGenSettings {
         return upperLimitScaleWeight.get(world, biome);
     }
 
-    public MaterialData getWaterBlock() {
+    public BlockData getWaterBlock() {
         return waterBlock.get(world);
     }
 }

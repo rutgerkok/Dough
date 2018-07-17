@@ -2,11 +2,12 @@ package nl.rutgerkok.doughworldgenerator;
 
 import java.util.Locale;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Biome;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.Plugin;
 
 import nl.rutgerkok.worldgeneratorapi.WorldRef;
@@ -34,11 +35,11 @@ public final class PluginConfig {
     public final FloatProperty mainNoiseScaleY;
     public final FloatProperty mainNoiseScaleZ;
     public final FloatProperty seaLevel;
-    public final Property<MaterialData> stoneBlock;
+    public final Property<BlockData> stoneBlock;
     public final FloatProperty stretchY;
     public final FloatProperty upperLimitScale;
     public final FloatProperty upperLimitScaleWeight;
-    public final Property<MaterialData> waterBlock;
+    public final Property<BlockData> waterBlock;
     public final Property<Long> worldSeed;
 
     PluginConfig(Plugin plugin, PropertyRegistry registry) {
@@ -53,7 +54,7 @@ public final class PluginConfig {
         depthNoiseScaleX = registry.getFloat(new NamespacedKey(plugin, "depth_noise_scale_x"), 200);
         depthNoiseScaleZ = registry.getFloat(new NamespacedKey(plugin, "depth_noise_scale_z"), 200);
         waterBlock = registry.getProperty(new NamespacedKey(plugin, "water_block"),
-                new MaterialData(Material.STATIONARY_WATER));
+                Material.WATER.createBlockData());
         worldSeed = registry.getProperty(PropertyRegistry.WORLD_SEED, -1L);
         heightScale = registry.getFloat(new NamespacedKey(plugin, "height_scale"), 684.412f);
         heightVariation = registry.getFloat(PropertyRegistry.HEIGHT_VARIATION, 0.1f);
@@ -63,7 +64,7 @@ public final class PluginConfig {
         mainNoiseScaleY = registry.getFloat(new NamespacedKey(plugin, "main_noise_scale_y"), 160);
         mainNoiseScaleZ = registry.getFloat(new NamespacedKey(plugin, "main_noise_scale_z"), 80);
         seaLevel = registry.getFloat(PropertyRegistry.SEA_LEVEL, 63);
-        stoneBlock = registry.getProperty(new NamespacedKey(plugin, "stone_block"), new MaterialData(Material.STONE));
+        stoneBlock = registry.getProperty(new NamespacedKey(plugin, "stone_block"), Material.STONE.createBlockData());
         stretchY = registry.getFloat(new NamespacedKey(plugin, "stretch_y"), 12);
         upperLimitScale = registry.getFloat(new NamespacedKey(plugin, "upper_limit_scale"), 512);
         upperLimitScaleWeight = registry.getFloat(new NamespacedKey(plugin, "upper_limit_scale_weight"), 1.2f);
@@ -110,11 +111,13 @@ public final class PluginConfig {
     }
 
     private void readWorldMaterialSetting(WorldRef world, ConfigurationSection config,
-            Property<MaterialData> property) {
-        String value = config.getString(property.getKey().getKey(), property.get(world).getItemType().toString());
-        Material material = Material.getMaterial(value);
-        if (material != null) {
-            property.setWorldDefault(world, new MaterialData(material));
+            Property<BlockData> property) {
+        String value = config.getString(property.getKey().getKey(), property.get(world).getAsString());
+        try {
+            BlockData material = Bukkit.createBlockData(value);
+            property.setWorldDefault(world, material);
+        } catch (IllegalArgumentException e) {
+            // Ignore
         }
     }
 
@@ -171,8 +174,8 @@ public final class PluginConfig {
     }
 
     private void writeWorldMaterialSetting(WorldRef world, ConfigurationSection config,
-            Property<MaterialData> property) {
-        config.set(property.getKey().getKey(), property.get(world).getItemType().toString());
+            Property<BlockData> property) {
+        config.set(property.getKey().getKey(), property.get(world).getAsString());
     }
 
     private void writeWorldSetting(WorldRef world, ConfigurationSection config, FloatProperty property) {

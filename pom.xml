@@ -8,10 +8,17 @@
 	<name>Dough</name>
 	<description>A Spigot plugin to customize the terrain shape.</description>
 	<inceptionYear>2018</inceptionYear>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 	<repositories>
 		<repository>
 			<id>spigot-repo</id>
 			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>rutger-repo</id>
+			<url>http://www.rutgerkok.nl/repo</url>
 		</repository>
 	</repositories>
 	<build>
@@ -40,13 +47,13 @@
 		<dependency>
 			<groupId>nl.rutgerkok</groupId>
 			<artifactId>worldgeneratorapi</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.12.2-R0.1-SNAPSHOT</version>
+			<version>1.13-pre7-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

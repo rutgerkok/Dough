@@ -4,6 +4,7 @@ main: nl.rutgerkok.doughworldgenerator.Startup
 author: Rutger Kok
 load: startup
 depends: [WorldGeneratorApi]
+api-version: 1.13
 commands:
   dough:
     permission: dough.admin
