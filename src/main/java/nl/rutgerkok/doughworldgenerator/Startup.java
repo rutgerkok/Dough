@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.logging.Level;
 
 import org.bukkit.ChatColor;
-import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -16,6 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import nl.rutgerkok.doughworldgenerator.chunkgen.ChunkGeneratorOverworld;
 import nl.rutgerkok.doughworldgenerator.chunkgen.OverworldGenSettings;
+import nl.rutgerkok.worldgeneratorapi.WorldGenerator;
 import nl.rutgerkok.worldgeneratorapi.WorldGeneratorApi;
 import nl.rutgerkok.worldgeneratorapi.WorldRef;
 
@@ -24,8 +24,8 @@ public class Startup extends JavaPlugin {
     private PluginConfig pluginConfig;
     private WorldGeneratorApi worldGeneratorApi;
 
-    private ChunkGeneratorOverworld createChunkGenerator(World world) {
-        WorldRef worldRef = WorldRef.of(world);
+    private void createChunkGenerator(WorldGenerator worldGenerator) {
+        WorldRef worldRef = worldGenerator.getWorldRef();
         File file = new File(getDataFolder(), worldRef.getName() + ".yml");
 
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -40,13 +40,13 @@ public class Startup extends JavaPlugin {
         }
 
         OverworldGenSettings overworldSettings = new OverworldGenSettings(pluginConfig, worldRef);
-        return new ChunkGeneratorOverworld(overworldSettings);
+        worldGenerator.setBaseChunkGenerator(new ChunkGeneratorOverworld(overworldSettings));
     }
 
     @Override
     public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
         WorldRef world = WorldRef.ofName(worldName);
-        return worldGeneratorApi.buildTerrainGenerator(world, this::createChunkGenerator).create();
+        return worldGeneratorApi.createCustomGenerator(world, this::createChunkGenerator);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class Startup extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        worldGeneratorApi = WorldGeneratorApi.getInstance(this, 0, 1);
+        worldGeneratorApi = WorldGeneratorApi.getInstance(this, 0, 2);
         pluginConfig = new PluginConfig(this, worldGeneratorApi.getPropertyRegistry());
     }
 }
