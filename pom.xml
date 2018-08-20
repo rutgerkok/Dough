@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.rutgerkok</groupId>
 	<artifactId>doughworldgenerator</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>Dough</name>
 	<description>A Spigot plugin to customize the terrain shape.</description>
 	<inceptionYear>2018</inceptionYear>
@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>nl.rutgerkok</groupId>
 			<artifactId>worldgeneratorapi</artifactId>
-			<version>0.2-SNAPSHOT</version>
+			<version>0.2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
