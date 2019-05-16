@@ -3,15 +3,17 @@ package nl.rutgerkok.doughworldgenerator.chunkgen;
 import java.util.Random;
 
 final class NoiseGeneratorOctaves {
+    public static double a(final double var0) {
+        return var0 - MathHelper.lFloor(var0 / 3.3554432E7 + 0.5) * 3.3554432E7;
+
+    }
+
     /**
      * Collection of noise generation functions. Output is combined to produce
      * different octaves of noise.
      */
     private final NoiseGeneratorImproved[] generatorCollection;
-    private final int octaves;
-
     public NoiseGeneratorOctaves(Random seed, int octavesIn) {
-        this.octaves = octavesIn;
         this.generatorCollection = new NoiseGeneratorImproved[octavesIn];
 
         for (int i = 0; i < octavesIn; ++i) {
@@ -19,48 +21,21 @@ final class NoiseGeneratorOctaves {
         }
     }
 
-    public double[] func_202646_a(int p_202646_1_, int p_202646_2_, int p_202646_3_, int p_202646_4_,
-            double p_202646_5_, double p_202646_7_, double p_202646_9_) {
-        return this.func_202647_a(p_202646_1_, 10, p_202646_2_, p_202646_3_, 1, p_202646_4_, p_202646_5_, 1.0D,
-                p_202646_7_);
-    }
+    public double a(final double var0, final double var2, final double var4, final double var6, final double var8,
+            final boolean var10) {
+        double var11 = 0.0;
+        double var12 = 1.0;
 
-    public double[] func_202647_a(int p_202647_1_, int p_202647_2_, int p_202647_3_, int p_202647_4_, int p_202647_5_,
-            int p_202647_6_, double p_202647_7_, double p_202647_9_, double p_202647_11_) {
-        double[] adouble = new double[p_202647_4_ * p_202647_5_ * p_202647_6_];
-        double d0 = 1.0D;
-
-        for (int i = 0; i < this.octaves; ++i) {
-            double d1 = p_202647_1_ * d0 * p_202647_7_;
-            double d2 = p_202647_2_ * d0 * p_202647_9_;
-            double d3 = p_202647_3_ * d0 * p_202647_11_;
-            long j = MathHelper.lFloor(d1);
-            long k = MathHelper.lFloor(d3);
-            d1 = d1 - j;
-            d3 = d3 - k;
-            j = j % 16777216L;
-            k = k % 16777216L;
-            d1 = d1 + j;
-            d3 = d3 + k;
-            this.generatorCollection[i].populateNoiseArray(adouble, d1, d2, d3, p_202647_4_, p_202647_5_, p_202647_6_,
-                    p_202647_7_ * d0, p_202647_9_ * d0, p_202647_11_ * d0, d0);
-            d0 /= 2.0D;
+        for (final NoiseGeneratorImproved var13 : this.generatorCollection) {
+            var11 += var13.a(a(var0 * var12), var10 ? (-var13.b) : a(var2 * var12), a(var4 * var12), var6 * var12,
+                    var8 * var12) / var12;
+            var12 /= 2.0;
         }
-
-        return adouble;
+        return var11;
     }
 
-    public double func_205563_a(double p_205563_1_, double p_205563_3_, double p_205563_5_)
-    {
-        double d0 = 0.0D;
-        double d1 = 1.0D;
-
-        for (int i = 0; i < this.octaves; ++i)
-        {
-            d0 += this.generatorCollection[i].func_205560_c(p_205563_1_ * d1, p_205563_3_ * d1, p_205563_5_ * d1) / d1;
-            d1 /= 2.0D;
-        }
-
-        return d0;
+    public NoiseGeneratorImproved a(final int var0) {
+        return this.generatorCollection[var0];
     }
+
 }

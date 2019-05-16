@@ -40,7 +40,7 @@ public class Startup extends JavaPlugin {
         }
 
         OverworldGenSettings overworldSettings = new OverworldGenSettings(pluginConfig, worldRef);
-        worldGenerator.setBaseChunkGenerator(new ChunkGeneratorOverworld(overworldSettings));
+        worldGenerator.setBaseNoiseGenerator(new ChunkGeneratorOverworld(overworldSettings));
     }
 
     @Override
@@ -72,7 +72,7 @@ public class Startup extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        worldGeneratorApi = WorldGeneratorApi.getInstance(this, 0, 2);
+        worldGeneratorApi = WorldGeneratorApi.getInstance(this, 0, 3);
         pluginConfig = new PluginConfig(this, worldGeneratorApi.getPropertyRegistry());
     }
 }

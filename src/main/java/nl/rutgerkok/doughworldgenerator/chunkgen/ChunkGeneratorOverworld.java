@@ -1,22 +1,17 @@
 package nl.rutgerkok.doughworldgenerator.chunkgen;
 
 import org.bukkit.block.Biome;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.generator.ChunkGenerator.ChunkData;
 
-import nl.rutgerkok.worldgeneratorapi.BaseChunkGenerator;
+import nl.rutgerkok.worldgeneratorapi.BaseNoiseGenerator;
 import nl.rutgerkok.worldgeneratorapi.BiomeGenerator;
 
-public class ChunkGeneratorOverworld implements BaseChunkGenerator {
+public class ChunkGeneratorOverworld implements BaseNoiseGenerator {
     private final NoiseGeneratorOctaves minLimitPerlinNoise;
     private final NoiseGeneratorOctaves maxLimitPerlinNoise;
     private final NoiseGeneratorOctaves mainPerlinNoise;
     private final OverworldGenSettings settings;
     private final NoiseGeneratorOctaves depthNoise;
     private final float[] biomeWeights;
-
-    private final BlockData stoneBlock;
-    private final BlockData waterBlock;
 
     public ChunkGeneratorOverworld(OverworldGenSettings settings) {
         SharedSeedRandom sharedseedrandom = new SharedSeedRandom(settings.getSeed());
@@ -36,183 +31,167 @@ public class ChunkGeneratorOverworld implements BaseChunkGenerator {
         }
 
         this.settings = settings;
-        this.stoneBlock = this.settings.getStoneBlock();
-        this.waterBlock = this.settings.getWaterBlock();
     }
 
-    private void calculateNoise(Biome[] biomes, int p_202108_2_, int p_202108_3_, int p_202108_4_,
-            double[] p_202108_5_) {
-        double[] adouble = this.depthNoise.func_202646_a(p_202108_2_, p_202108_4_, 5, 5, this.settings.getDepthNoiseScaleX(),
-                this.settings.getDepthNoiseScaleZ(), this.settings.getDepthNoiseScaleExponent());
-        float f = this.settings.getCoordinateScale();
-        float f1 = this.settings.getHeightScale();
-        double[] adouble1 = this.mainPerlinNoise.func_202647_a(p_202108_2_, p_202108_3_, p_202108_4_, 5, 33, 5,
-                f / this.settings.getMainNoiseScaleX(), f1 / this.settings.getMainNoiseScaleY(),
-                f / this.settings.getMainNoiseScaleZ());
-        double[] adouble2 = this.minLimitPerlinNoise.func_202647_a(p_202108_2_, p_202108_3_, p_202108_4_, 5, 33, 5,
-                f, f1, f);
-        double[] adouble3 = this.maxLimitPerlinNoise.func_202647_a(p_202108_2_, p_202108_3_, p_202108_4_, 5, 33, 5,
-                f, f1, f);
-        int i = 0;
-        int j = 0;
+    private double a(Biome biome, int i, int j, int k, double d0, double d1, double d2, double d3, double d2z) {
 
-        for (int k = 0; k < 5; ++k) {
-            for (int l = 0; l < 5; ++l) {
-                float f2 = 0.0F;
-                float f3 = 0.0F;
-                float f4 = 0.0F;
-                Biome biome = biomes[k + 2 + (l + 2) * 10];
+        double d4 = 0.0;
+        double d5 = 0.0;
+        double d6 = 0.0;
+        double d7 = 1.0;
 
-                for (int j1 = -2; j1 <= 2; ++j1) {
-                    for (int k1 = -2; k1 <= 2; ++k1) {
-                        Biome biome1 = biomes[k + j1 + 2 + (l + k1 + 2) * 10];
-                        float f5 = this.settings.getBiomeDepthOffset()
-                                + settings.getBaseHeight(biome1) * this.settings.getBiomeDepthWeight();
-                        float f6 = this.settings.getBiomeScaleOffset()
-                                + settings.getHeightVariation(biome1) * this.settings.getBiomeScaleWeight();
+        for (int l = 0; l < 16; ++l) {
+            final double d8 = NoiseGeneratorOctaves.a(i * d0 * d7);
+            final double d9 = NoiseGeneratorOctaves.a(j * d1 * d7);
+            final double d10 = NoiseGeneratorOctaves.a(k * d0 * d7);
+            final double d11 = d1 * d7;
 
-                        float f7 = this.biomeWeights[j1 + 2 + (k1 + 2) * 5] / (f5 + 2.0F);
+            d4 += this.minLimitPerlinNoise.a(l).a(d8, d9, d10, d11, j * d11) / d7;
+            d5 += this.maxLimitPerlinNoise.a(l).a(d8, d9, d10, d11, j * d11) / d7;
+            if (l < 8) {
+                d6 += this.mainPerlinNoise.a(l).a(NoiseGeneratorOctaves.a(i * d2 * d7),
+                        NoiseGeneratorOctaves.a(j * d3 * d7), NoiseGeneratorOctaves.a(k * d2z * d7), d3 * d7,
+                        j * d3 * d7) / d7;
 
-                        if (settings.getBaseHeight(biome1) > settings.getBaseHeight(biome)) {
-                            f7 /= 2.0F;
-                        }
-
-                        f2 += f6 * f7;
-                        f3 += f5 * f7;
-                        f4 += f7;
-                    }
-                }
-
-                f2 = f2 / f4;
-                f3 = f3 / f4;
-                f2 = f2 * 0.9F + 0.1F;
-                f3 = (f3 * 4.0F - 1.0F) / 8.0F;
-                double d7 = adouble[j] / 8000.0D;
-
-                if (d7 < 0.0D) {
-                    d7 = -d7 * 0.3D;
-                }
-
-                d7 = d7 * 3.0D - 2.0D;
-
-                if (d7 < 0.0D) {
-                    d7 = d7 / 2.0D;
-
-                    if (d7 < -1.0D) {
-                        d7 = -1.0D;
-                    }
-
-                    d7 = d7 / 1.4D;
-                    d7 = d7 / 2.0D;
-                } else {
-                    if (d7 > 1.0D) {
-                        d7 = 1.0D;
-                    }
-
-                    d7 = d7 / 8.0D;
-                }
-
-                ++j;
-                double d8 = f3;
-                double d9 = f2;
-                d8 = d8 + d7 * 0.2D;
-                d8 = d8 * this.settings.getBaseSize() / 8.0D;
-                double d0 = this.settings.getBaseSize() + d8 * 4.0D;
-
-                for (int l1 = 0; l1 < 33; ++l1) {
-                    double d1 = (l1 - d0) * this.settings.getStretchY() * 128.0D / 256.0D / d9;
-
-                    if (d1 < 0.0D) {
-                        d1 *= 4.0D;
-                    }
-
-                    double d2 = adouble2[i] / this.settings.getLowerLimitScale(biome);
-                    double d3 = adouble3[i] / this.settings.getUpperLimitScale(biome);
-                    double d4 = (adouble1[i] / 10.0D + 1.0D) / 2.0D;
-                    double d5;
-                    if (d4 < this.settings.getLowerLimitScaleWeight(biome)) {
-                        d5 = d2;
-                    } else if (d4 > this.settings.getUpperLimitScaleWeight(biome)) {
-                        d5 = d3;
-                    } else {
-                        d5 = d2 + (d3 - d2) * d4;
-                    }
-                    d5 -= d1;
-
-                    if (l1 > 29) {
-                        double d6 = (l1 - 29) / 3.0F;
-                        d5 = d5 * (1.0D - d6) - 10.0D * d6;
-                    }
-
-                    p_202108_5_[i] = d5;
-                    ++i;
-                }
             }
+            d7 /= 2.0;
+
         }
+
+        double dd2 = d4 / this.settings.getLowerLimitScale(biome);
+        double dd3 = d5 / this.settings.getUpperLimitScale(biome);
+        double dd4 = (d6 / 10.0D + 1.0D) / 2.0D;
+        double dd5;
+        if (dd4 < this.settings.getLowerLimitScaleWeight(biome)) {
+            dd5 = dd2;
+        } else if (dd4 > this.settings.getUpperLimitScaleWeight(biome)) {
+            dd5 = dd3;
+        } else {
+            dd5 = dd2 + (dd3 - dd2) * dd4;
+        }
+        return dd5;
     }
 
-    private void setBlocksInChunk(BiomeGenerator biomeGenerator, int chunkX, int chunkZ, ChunkData primer) {
-        Biome[] abiome = biomeGenerator.getZoomedOutBiomes(chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
-        double[] adouble = new double[825];
-        this.calculateNoise(abiome, chunkX * 4, 0, chunkZ * 4, adouble);
+    private double[] a(BiomeGenerator biomeGenerator, Biome biome, int i, int j) {
+        final double[] adouble = new double[2];
 
-        for (int i = 0; i < 4; ++i) {
-            int j = i * 5;
-            int k = (i + 1) * 5;
+        float f2 = 0.0F;
+        float f3 = 0.0F;
+        float f4 = 0.0F;
 
-            for (int l = 0; l < 4; ++l) {
-                int i1 = (j + l) * 33;
-                int j1 = (j + l + 1) * 33;
-                int k1 = (k + l) * 33;
-                int l1 = (k + l + 1) * 33;
+        for (int j1 = -2; j1 <= 2; ++j1) {
+            for (int k1 = -2; k1 <= 2; ++k1) {
+                Biome biome1 = biomeGenerator.getZoomedOutBiome(i + j1, j + k1);
+                float f5 = this.settings.getBiomeDepthOffset()
+                        + settings.getBaseHeight(biome1) * this.settings.getBiomeDepthWeight();
+                float f6 = this.settings.getBiomeScaleOffset()
+                        + settings.getHeightVariation(biome1) * this.settings.getBiomeScaleWeight();
 
-                for (int i2 = 0; i2 < 32; ++i2) {
-                    double d1 = adouble[i1 + i2];
-                    double d2 = adouble[j1 + i2];
-                    double d3 = adouble[k1 + i2];
-                    double d4 = adouble[l1 + i2];
-                    double d5 = (adouble[i1 + i2 + 1] - d1) * 0.125D;
-                    double d6 = (adouble[j1 + i2 + 1] - d2) * 0.125D;
-                    double d7 = (adouble[k1 + i2 + 1] - d3) * 0.125D;
-                    double d8 = (adouble[l1 + i2 + 1] - d4) * 0.125D;
+                float f7 = this.biomeWeights[j1 + 2 + (k1 + 2) * 5] / (f5 + 2.0F);
 
-                    for (int j2 = 0; j2 < 8; ++j2) {
-                        double d10 = d1;
-                        double d11 = d2;
-                        double d12 = (d3 - d1) * 0.25D;
-                        double d13 = (d4 - d2) * 0.25D;
-
-                        for (int k2 = 0; k2 < 4; ++k2) {
-                            double d16 = (d11 - d10) * 0.25D;
-                            double lvt_48_1_ = d10 - d16;
-
-                            for (int l2 = 0; l2 < 4; ++l2) {
-                                int x = i * 4 + k2, y = i2 * 8 + j2, z = l * 4 + l2;
-
-                                if ((lvt_48_1_ += d16) > 0.0D) {
-                                    primer.setBlock(x, y, z, this.stoneBlock);
-                                } else if (i2 * 8 + j2 < this.settings.getSeaLevel()) {
-                                    primer.setBlock(x, y, z, this.waterBlock);
-                                }
-                            }
-
-                            d10 += d12;
-                            d11 += d13;
-                        }
-
-                        d1 += d5;
-                        d2 += d6;
-                        d3 += d7;
-                        d4 += d8;
-                    }
+                if (settings.getBaseHeight(biome1) > settings.getBaseHeight(biome)) {
+                    f7 /= 2.0F;
                 }
+
+                f2 += f6 * f7;
+                f3 += f5 * f7;
+                f4 += f7;
             }
         }
+
+        f2 = f2 / f4;
+        f3 = f3 / f4;
+        f2 = f2 * 0.9F + 0.1F;
+        f3 = (f3 * 4.0F - 1.0F) / 8.0F;
+        adouble[0] = f3 + this.c(i, j);
+        adouble[1] = f2;
+        return adouble;
+    }
+
+    protected void a(BiomeGenerator biomeGenerator, final double[] adouble, final int i, final int j, final double d0,
+            final double d1,
+            final double d2, final double d3, double d2z, final int k, final int l) {
+        Biome biome = biomeGenerator.getZoomedOutBiome(i, j);
+        final double[] adouble2 = this.a(biomeGenerator, biome, i, j);
+        final double d4 = adouble2[0];
+        final double d5 = adouble2[1];
+        final double d6 = this.g();
+        final double d7 = this.h();
+
+        for (int i2 = 0; i2 < this.i(); ++i2) {
+            double d8 = this.a(biome, i, i2, j, d0, d1, d2, d3, d2z);
+
+            d8 -= this.a(d4, d5, i2);
+
+            if (i2 > d6) {
+                d8 = MathHelper.b(d8, l, (i2 - d6) / k);
+            } else if (i2 < d7) {
+                d8 = MathHelper.b(d8, -30.0, (d7 - i2) / (d7 - 1.0));
+
+            }
+            adouble[i2] = d8;
+
+        }
+
+    }
+
+    private double a(double d0, double d1, int i) {
+        final double d2 = this.settings.getBaseSize();
+                double d3 = (i - (d2 + d0 * d2 / 8.0 * 4.0)) * this.settings.getStretchY() * 128.0 / 256.0 / d1;
+      
+             if (d3 < 0.0) {
+                  d3 *= 4.0;
+           
+                   }
+                      return d3;
+    }
+
+    private double c(final int i, final int j) {
+            double d0 = this.depthNoise.a(i * this.settings.getDepthNoiseScaleX(), 10.0,
+                    j * this.settings.getDepthNoiseScaleZ(), 1.0, 0.0, true) / 8000.0;
+
+            if (d0 < 0.0) {
+                d0 = -d0 * 0.3;
+
+            }
+            d0 = d0 * 3.0 - 2.0;
+            if (d0 < 0.0) {
+                d0 /= 28.0;
+            } else {
+                if (d0 > 1.0) {
+                    d0 = 1.0;
+
+                }
+                d0 /= 40.0;
+
+            }
+            return d0;
+
+        }
+
+    protected double g() {
+        return this.i() - 4;
     }
 
     @Override
-    public void setBlocksInChunk(GeneratingChunk chunk) {
-        setBlocksInChunk(chunk.getBiomeGenerator(), chunk.getChunkX(), chunk.getChunkZ(),
-                chunk.getBlocksForChunk());
+    public void getNoise(BiomeGenerator biomeGenerator, double[] buffer, int x, int z) {
+        final double d0 = settings.getCoordinateScale();
+        final double d2 = settings.getHeightScale();
+        final double d3 = settings.getCoordinateScale() / settings.getMainNoiseScaleX();
+        final double d4 = settings.getHeightScale() / settings.getMainNoiseScaleY();
+        final double d5 = settings.getCoordinateScale() / settings.getMainNoiseScaleZ();
+
+        this.a(biomeGenerator, buffer, x, z, d0, d2, d3, d4, d5, 3, -10);
+
     }
+
+    protected double h() {
+        return 0.0;
+
+    }
+
+    private int i() {
+       return 33;
+    }
+
 }
