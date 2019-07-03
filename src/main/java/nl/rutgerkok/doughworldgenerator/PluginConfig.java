@@ -63,7 +63,7 @@ public final class PluginConfig {
         mainNoiseScaleX = registry.getFloat(new NamespacedKey(plugin, "main_noise_scale_x"), 80);
         mainNoiseScaleY = registry.getFloat(new NamespacedKey(plugin, "main_noise_scale_y"), 160);
         mainNoiseScaleZ = registry.getFloat(new NamespacedKey(plugin, "main_noise_scale_z"), 80);
-        seaLevel = registry.getFloat(PropertyRegistry.SEA_LEVEL, 63);
+        seaLevel = registry.getFloat(new NamespacedKey(plugin, "sea_level"), 63);
         stoneBlock = registry.getProperty(new NamespacedKey(plugin, "stone_block"), Material.STONE.createBlockData());
         stretchY = registry.getFloat(new NamespacedKey(plugin, "stretch_y"), 12);
         upperLimitScale = registry.getFloat(new NamespacedKey(plugin, "upper_limit_scale"), 512);

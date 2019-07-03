@@ -185,13 +185,22 @@ public class ChunkGeneratorOverworld implements BaseNoiseGenerator {
 
     }
 
+    @Override
+    public TerrainSettings getTerrainSettings() {
+        TerrainSettings settings = new TerrainSettings();
+        settings.stoneBlock = this.settings.getStoneBlock();
+        settings.waterBlock = this.settings.getWaterBlock();
+        settings.seaLevel = this.settings.getSeaLevel();
+        return settings;
+    }
+
     protected double h() {
         return 0.0;
 
     }
 
     private int i() {
-       return 33;
+        return 33;
     }
 
 }
