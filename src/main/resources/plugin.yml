@@ -3,8 +3,8 @@ version: "${project.version}"
 main: nl.rutgerkok.doughworldgenerator.Startup
 author: Rutger Kok
 load: startup
-depends: [WorldGeneratorApi]
-api-version: 1.13
+depend: [WorldGeneratorApi]
+api-version: 1.15
 commands:
   dough:
     permission: dough.admin
