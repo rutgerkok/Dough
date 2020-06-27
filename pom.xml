@@ -17,8 +17,8 @@
 			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
 		</repository>
 		<repository>
-			<id>rutger-repo</id>
-			<url>http://www.rutgerkok.nl/repo</url>
+			<id>codemc-repo</id>
+			<url>https://repo.codemc.io/repository/maven-public/</url>
 		</repository>
 	</repositories>
 	<build>
@@ -47,7 +47,7 @@
 		<dependency>
 			<groupId>nl.rutgerkok</groupId>
 			<artifactId>worldgeneratorapi</artifactId>
-			<version>0.4</version>
+			<version>0.6</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
