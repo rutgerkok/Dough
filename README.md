@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/rutgerkok/Dough.svg?branch=master)](https://travis-ci.com/rutgerkok/Dough)
 
-Minecraft 1.13 removed the "Customized" world type, with the promise that those settings would come back. Of course, that hasn't happened yet. For that reason, this plugin brings at least the terrain shape settings back. In addition, some settings have been made biome-specific.
+Minecraft 1.14 and Minecraft 1.15 lacked the "Customized" world type. This example plugin shows how one could add it back using [WorldGeneratorApi](https://github.com/rutgerkok/WorldGeneratorApi). This plugin implements all terrain shape settings of the old "Customized" world type, and still works on newer versions of Minecraft.
 
 ![Screenshot](.github/screenshot.png)
 
