@@ -1,19 +1,25 @@
 package nl.rutgerkok.doughworldgenerator.chunkgen;
 
+import java.util.Objects;
+
 import org.bukkit.block.Biome;
+import org.bukkit.generator.BiomeProvider;
+import org.bukkit.generator.WorldInfo;
 
-import nl.rutgerkok.worldgeneratorapi.BaseNoiseGenerator;
-import nl.rutgerkok.worldgeneratorapi.BiomeGenerator;
+import nl.rutgerkok.worldgeneratorapi.BaseNoiseProvider;
+import nl.rutgerkok.worldgeneratorapi.WorldGeneratorApi;
 
-public class ChunkGeneratorOverworld implements BaseNoiseGenerator {
+public class NoiseGeneratorOverworld implements BaseNoiseProvider {
     private final NoiseGeneratorOctaves minLimitPerlinNoise;
     private final NoiseGeneratorOctaves maxLimitPerlinNoise;
     private final NoiseGeneratorOctaves mainPerlinNoise;
     private final OverworldGenSettings settings;
     private final NoiseGeneratorOctaves depthNoise;
     private final float[] biomeWeights;
+    private final WorldGeneratorApi worldGeneratorApi;
 
-    public ChunkGeneratorOverworld(OverworldGenSettings settings) {
+    public NoiseGeneratorOverworld(WorldGeneratorApi worldGeneratorApi, OverworldGenSettings settings) {
+        this.worldGeneratorApi = Objects.requireNonNull(worldGeneratorApi, "worldGeneratorApi");
         SharedSeedRandom sharedseedrandom = new SharedSeedRandom(settings.getSeed());
         this.minLimitPerlinNoise = new NoiseGeneratorOctaves(sharedseedrandom, 16);
         this.maxLimitPerlinNoise = new NoiseGeneratorOctaves(sharedseedrandom, 16);
@@ -72,7 +78,18 @@ public class ChunkGeneratorOverworld implements BaseNoiseGenerator {
         return dd5;
     }
 
-    private double[] a(BiomeGenerator biomeGenerator, Biome biome, int i, int j) {
+    private double a(double d0, double d1, int i) {
+        final double d2 = this.settings.getBaseSize();
+                double d3 = (i - (d2 + d0 * d2 / 8.0 * 4.0)) * this.settings.getStretchY() * 128.0 / 256.0 / d1;
+
+             if (d3 < 0.0) {
+                  d3 *= 4.0;
+
+                   }
+                      return d3;
+    }
+
+    private double[] a(WorldInfo worldInfo, BiomeProvider biomeGenerator, Biome biome, int i, int j) {
         final double[] adouble = new double[2];
 
         float f2 = 0.0F;
@@ -81,7 +98,7 @@ public class ChunkGeneratorOverworld implements BaseNoiseGenerator {
 
         for (int j1 = -2; j1 <= 2; ++j1) {
             for (int k1 = -2; k1 <= 2; ++k1) {
-                Biome biome1 = biomeGenerator.getZoomedOutBiome(i + j1, j + k1);
+                Biome biome1 = biomeGenerator.getBiome(worldInfo, (i + j1) << 2, 70, (j + k1) << 2);
                 float f5 = this.settings.getBiomeDepthOffset()
                         + settings.getBaseHeight(biome1) * this.settings.getBiomeDepthWeight();
                 float f6 = this.settings.getBiomeScaleOffset()
@@ -108,11 +125,10 @@ public class ChunkGeneratorOverworld implements BaseNoiseGenerator {
         return adouble;
     }
 
-    protected void a(BiomeGenerator biomeGenerator, final double[] adouble, final int i, final int j, final double d0,
-            final double d1,
-            final double d2, final double d3, double d2z, final int k, final int l) {
-        Biome biome = biomeGenerator.getZoomedOutBiome(i, j);
-        final double[] adouble2 = this.a(biomeGenerator, biome, i, j);
+    protected void a(WorldInfo worldInfo, BiomeProvider biomeProvider, final double[] adouble, final int i, final int j,
+            final double d0, final double d1, final double d2, final double d3, double d2z, final int k, final int l) {
+        Biome biome = biomeProvider.getBiome(worldInfo, i << 2, 70, j << 2);
+        final double[] adouble2 = this.a(worldInfo, biomeProvider, biome, i, j);
         final double d4 = adouble2[0];
         final double d5 = adouble2[1];
         final double d6 = this.g();
@@ -133,17 +149,6 @@ public class ChunkGeneratorOverworld implements BaseNoiseGenerator {
 
         }
 
-    }
-
-    private double a(double d0, double d1, int i) {
-        final double d2 = this.settings.getBaseSize();
-                double d3 = (i - (d2 + d0 * d2 / 8.0 * 4.0)) * this.settings.getStretchY() * 128.0 / 256.0 / d1;
-      
-             if (d3 < 0.0) {
-                  d3 *= 4.0;
-           
-                   }
-                      return d3;
     }
 
     private double c(final int i, final int j) {
@@ -174,20 +179,20 @@ public class ChunkGeneratorOverworld implements BaseNoiseGenerator {
     }
 
     @Override
-    public void getNoise(BiomeGenerator biomeGenerator, double[] buffer, int x, int z) {
+    public void getNoise(WorldInfo world, double[] buffer, int x, int z) {
         final double d0 = settings.getCoordinateScale();
         final double d2 = settings.getHeightScale();
         final double d3 = settings.getCoordinateScale() / settings.getMainNoiseScaleX();
         final double d4 = settings.getHeightScale() / settings.getMainNoiseScaleY();
         final double d5 = settings.getCoordinateScale() / settings.getMainNoiseScaleZ();
 
-        this.a(biomeGenerator, buffer, x, z, d0, d2, d3, d4, d5, 3, -10);
+        this.a(world, this.worldGeneratorApi.getBiomeProvider(world), buffer, x, z, d0, d2, d3, d4, d5, 3, -10);
 
     }
 
     @Override
-    public TerrainSettings getTerrainSettings() {
-        TerrainSettings settings = new TerrainSettings();
+    public TerrainConfig getTerrainSettings() {
+        TerrainConfig settings = new TerrainConfig();
         settings.stoneBlock = this.settings.getStoneBlock();
         settings.waterBlock = this.settings.getWaterBlock();
         settings.seaLevel = this.settings.getSeaLevel();

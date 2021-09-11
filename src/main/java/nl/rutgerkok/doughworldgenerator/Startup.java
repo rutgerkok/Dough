@@ -13,9 +13,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import nl.rutgerkok.doughworldgenerator.chunkgen.ChunkGeneratorOverworld;
+import nl.rutgerkok.doughworldgenerator.chunkgen.NoiseGeneratorOverworld;
 import nl.rutgerkok.doughworldgenerator.chunkgen.OverworldGenSettings;
-import nl.rutgerkok.worldgeneratorapi.WorldGenerator;
+import nl.rutgerkok.worldgeneratorapi.BasePopulator;
 import nl.rutgerkok.worldgeneratorapi.WorldGeneratorApi;
 import nl.rutgerkok.worldgeneratorapi.WorldRef;
 
@@ -24,8 +24,9 @@ public class Startup extends JavaPlugin {
     private PluginConfig pluginConfig;
     private WorldGeneratorApi worldGeneratorApi;
 
-    private void createChunkGenerator(WorldGenerator worldGenerator) {
-        WorldRef worldRef = worldGenerator.getWorldRef();
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+        WorldRef worldRef = WorldRef.ofName(worldName);
         File file = new File(getDataFolder(), worldRef.getName() + ".yml");
 
         YamlConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -33,6 +34,7 @@ public class Startup extends JavaPlugin {
 
         config.getKeys(false).forEach(key -> config.set(key, null));
         pluginConfig.writeSettings(worldRef, config);
+
         try {
             config.save(file);
         } catch (IOException e) {
@@ -40,13 +42,9 @@ public class Startup extends JavaPlugin {
         }
 
         OverworldGenSettings overworldSettings = new OverworldGenSettings(pluginConfig, worldRef);
-        worldGenerator.setBaseNoiseGenerator(new ChunkGeneratorOverworld(overworldSettings));
-    }
-
-    @Override
-    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
-        WorldRef world = WorldRef.ofName(worldName);
-        return worldGeneratorApi.createCustomGenerator(world, this::createChunkGenerator);
+        BasePopulator basePopulator = worldGeneratorApi
+                .createBasePopulatorFromNoiseFunction(new NoiseGeneratorOverworld(worldGeneratorApi, overworldSettings));
+        return new DoughChunkGenerator(basePopulator);
     }
 
     @Override
@@ -72,7 +70,7 @@ public class Startup extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        worldGeneratorApi = WorldGeneratorApi.getInstance(this, 0, 3);
+        worldGeneratorApi = WorldGeneratorApi.getInstance(this, 1, 3);
         pluginConfig = new PluginConfig(this, worldGeneratorApi.getPropertyRegistry());
     }
 }
