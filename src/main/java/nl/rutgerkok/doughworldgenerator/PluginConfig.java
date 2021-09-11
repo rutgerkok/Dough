@@ -55,7 +55,7 @@ public final class PluginConfig {
         depthNoiseScaleZ = registry.getFloat(new NamespacedKey(plugin, "depth_noise_scale_z"), 200);
         waterBlock = registry.getProperty(new NamespacedKey(plugin, "water_block"),
                 Material.WATER.createBlockData());
-        worldSeed = registry.getProperty(PropertyRegistry.WORLD_SEED, -1L);
+        worldSeed = registry.getProperty(new NamespacedKey(plugin, "world_seed"), -1L);
         heightScale = registry.getFloat(new NamespacedKey(plugin, "height_scale"), 684.412f);
         heightVariation = registry.getFloat(PropertyRegistry.HEIGHT_VARIATION, 0.1f);
         lowerLimitScale = registry.getFloat(new NamespacedKey(plugin, "lower_limit_scale"), 512);
@@ -96,6 +96,7 @@ public final class PluginConfig {
         readWorldSetting(world, config, depthNoiseScaleX);
         readWorldSetting(world, config, depthNoiseScaleZ);
         readWorldMaterialSetting(world, config, waterBlock);
+        readWorldLongSetting(world, config, worldSeed);
         readWorldSetting(world, config, heightScale);
         readBiomeSetting(world, config, heightVariation);
         readBiomeSetting(world, config, lowerLimitScale);
@@ -108,6 +109,11 @@ public final class PluginConfig {
         readWorldSetting(world, config, stretchY);
         readBiomeSetting(world, config, upperLimitScale);
         readBiomeSetting(world, config, upperLimitScaleWeight);
+    }
+
+    private void readWorldLongSetting(WorldRef world, ConfigurationSection config, Property<Long> property) {
+        long value = config.getLong(property.getKey().getKey(), property.get(world));
+        property.setWorldDefault(world, value);
     }
 
     private void readWorldMaterialSetting(WorldRef world, ConfigurationSection config,
@@ -159,6 +165,7 @@ public final class PluginConfig {
         writeWorldSetting(world, config, depthNoiseScaleX);
         writeWorldSetting(world, config, depthNoiseScaleZ);
         writeWorldMaterialSetting(world, config, waterBlock);
+        writeWorldLongSetting(world, config, worldSeed);
         writeWorldSetting(world, config, heightScale);
         writeBiomeSetting(world, config, heightVariation);
         writeBiomeSetting(world, config, lowerLimitScale);
@@ -171,6 +178,10 @@ public final class PluginConfig {
         writeWorldSetting(world, config, stretchY);
         writeBiomeSetting(world, config, upperLimitScale);
         writeBiomeSetting(world, config, upperLimitScaleWeight);
+    }
+
+    private void writeWorldLongSetting(WorldRef world, ConfigurationSection config, Property<Long> property) {
+        config.set(property.getKey().getKey(), property.get(world));
     }
 
     private void writeWorldMaterialSetting(WorldRef world, ConfigurationSection config,
