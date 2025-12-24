@@ -1,5 +1,6 @@
 package nl.rutgerkok.doughworldgenerator;
 
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 
 /**
@@ -28,5 +29,21 @@ public final class PluginLogger {
      */
     public void info(String message) {
         componentLogger.info(message);
+    }
+
+    /**
+     * Logs a warning message.
+     * @param warning The warning message
+     */
+    public void warning(Component warning) {
+        componentLogger.warn(warning);
+    }
+
+    /**
+     * Logs a warning message.
+     * @param warning The warning message
+     */
+    public void warning(String warning) {
+        componentLogger.warn(warning);
     }
 }

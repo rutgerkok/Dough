@@ -10,7 +10,7 @@ public class DoughMain extends JavaPlugin {
     @Override
     public void onEnable() {
         PluginLogger logger = new PluginLogger(getComponentLogger());
-        VanillaDatapackExtractor extractor = new VanillaDatapackExtractor(logger, getVanillaDatapackPath());
+        VanillaDatapackExtractor extractor = new VanillaDatapackExtractor(logger, getVanillaDatapackPath(), getServer().getMinecraftVersion());
         if (!extractor.extractIfNecessary()) {
             setEnabled(false);
             return;
@@ -20,8 +20,7 @@ public class DoughMain extends JavaPlugin {
     }
 
     private Path getVanillaDatapackPath() {
-        String minecraftVersion = getServer().getMinecraftVersion();
-        return getDataPath().resolve("vanilla-datapacks-do-not-edit").resolve(minecraftVersion);
+        return getDataPath().resolve(Constants.VANILLA_DATAPACKS_FOLDER);
     }
 
     private void checkForDatapack() {
@@ -34,7 +33,7 @@ public class DoughMain extends JavaPlugin {
             }
         }
         if (!foundDatapack) {
-            getLogger().severe("The Dough datapack was not found! Did you disable the datapack?");
+            getLogger().severe("The Dough datapack was not found! Was there an error during startup?");
         }
     }
 }
