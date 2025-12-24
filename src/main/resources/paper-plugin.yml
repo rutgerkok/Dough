@@ -1,0 +1,9 @@
+name: DoughWorldGenerator
+version: "${version}"
+main: nl.rutgerkok.doughworldgenerator.DoughMain
+description: For reshaping continents and biome locations
+api-version: '1.21.11'
+bootstrapper: nl.rutgerkok.doughworldgenerator.DoughBootstrap
+load: STARTUP
+author: Rutger Kok
+website: https://www.rutgerkok.nl/

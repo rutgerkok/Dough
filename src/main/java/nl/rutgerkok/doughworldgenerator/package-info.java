@@ -1,5 +1,4 @@
-/**
- * Main package of the plugin.
- *
- */
+@NullMarked
 package nl.rutgerkok.doughworldgenerator;
+
+import org.jspecify.annotations.NullMarked;
