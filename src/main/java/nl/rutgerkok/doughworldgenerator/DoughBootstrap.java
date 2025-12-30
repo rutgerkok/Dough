@@ -1,14 +1,23 @@
 package nl.rutgerkok.doughworldgenerator;
 
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
+import io.papermc.paper.plugin.configuration.PluginMeta;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import nl.rutgerkok.doughworldgenerator.config.InvalidConfigException;
+import nl.rutgerkok.doughworldgenerator.config.PluginInternalConfig;
 import nl.rutgerkok.doughworldgenerator.config.WorldConfig;
 import nl.rutgerkok.doughworldgenerator.generator.DatapackGenerator;
+import nl.rutgerkok.doughworldgenerator.mapitem.MapCommand;
+import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 @SuppressWarnings("unused") // Referenced in paper-plugin.yml
 public class DoughBootstrap implements PluginBootstrap {
@@ -17,29 +26,23 @@ public class DoughBootstrap implements PluginBootstrap {
     @Override
     public void bootstrap(BootstrapContext context) {
         PluginLogger logger = new PluginLogger(context.getLogger());
+        PluginInternalConfig internalConfig = PluginInternalConfig.load(context.getDataDirectory(), logger);
 
         // Load world config
-        Path worldConfigFile = context.getDataDirectory().resolve(Constants.WORLD_CONFIG_FILE_NAME);
-        WorldConfig worldConfig;
-        try {
-            worldConfig = WorldConfig.load(worldConfigFile);
-        } catch (InvalidConfigException e) {
-            e.log(logger);
-            return;
-        } catch (IOException e) {
-            logger.severe("Failed to load world config", e);
+        WorldConfig worldConfig = getWorldConfig(context, logger);
+        if (worldConfig == null) {
             return;
         }
 
         // Find previously extracted vanilla datapack
-        Path datapackPath = context.getDataDirectory().resolve(Constants.GENERATED_DATAPACK_NAME);
-        Path vanillaDatapackPath = VanillaDatapackExtractor.getVersionSpecificFolder(context.getDataDirectory().resolve(Constants.VANILLA_DATAPACKS_FOLDER));
+        Path vanillaDatapackPath = getVanillaDatapackPath(context, internalConfig);
         if (vanillaDatapackPath == null) {
             logger.info("No vanilla datapack extracted yet, will do so later. Cannot apply custom world generation settings yet.");
             return; // Vanilla datapack not yet extracted, cannot register our datapack
         }
 
         // Generate our datapack
+        Path datapackPath = context.getDataDirectory().resolve(Constants.GENERATED_DATAPACK_NAME);
         try {
             DatapackGenerator datapackGenerator = new DatapackGenerator(vanillaDatapackPath);
             datapackGenerator.write(datapackPath, worldConfig);
@@ -49,6 +52,37 @@ public class DoughBootstrap implements PluginBootstrap {
         }
 
         // Register datapack
+        registerDatapack(context, datapackPath, logger);
+
+        // Register commands
+        registerCommands(context);
+    }
+
+    private static @Nullable Path getVanillaDatapackPath(BootstrapContext context, PluginInternalConfig internalConfig) {
+        String minecraftVersion = internalConfig.minecraftVersion;
+        Path vanillaDatapackPath = null;
+        if (!internalConfig.minecraftVersion.isEmpty()) {
+            vanillaDatapackPath = context.getDataDirectory().resolve(Constants.VANILLA_DATAPACKS_FOLDER).resolve(minecraftVersion);
+            if (!Files.isDirectory(vanillaDatapackPath)) {
+                vanillaDatapackPath = null; // Not found
+            }
+        }
+        return vanillaDatapackPath;
+    }
+
+    private void registerCommands(BootstrapContext context) {
+        context.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(
+                event -> {
+                    LiteralCommandNode<CommandSourceStack> doughCommand = Commands.literal("dough")
+                            .then(MapCommand.command())
+                            .build();
+                    event.registrar().register(context.getPluginMeta(), doughCommand,
+                            "Commands for Dough World Generator plugin", List.of());
+                }
+        ));
+    }
+
+    private static void registerDatapack(BootstrapContext context, Path datapackPath, PluginLogger logger) {
         context.getLifecycleManager().registerEventHandler(LifecycleEvents.DATAPACK_DISCOVERY.newHandler(
                 event -> {
                     try {
@@ -60,6 +94,21 @@ public class DoughBootstrap implements PluginBootstrap {
                     }
                 }
         ));
+    }
+
+    private static @Nullable WorldConfig getWorldConfig(BootstrapContext context, PluginLogger logger) {
+        Path worldConfigFile = context.getDataDirectory().resolve(Constants.WORLD_CONFIG_FILE_NAME);
+        WorldConfig worldConfig;
+        try {
+            worldConfig = WorldConfig.load(worldConfigFile);
+        } catch (InvalidConfigException e) {
+            e.log(logger);
+            return null;
+        } catch (IOException e) {
+            logger.severe("Failed to load world config", e);
+            return null;
+        }
+        return worldConfig;
     }
 
 

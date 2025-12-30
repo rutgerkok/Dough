@@ -8,7 +8,20 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Formula {
-    
+
+    /**
+     * The identity formula: f(x) = x
+     */
+    public static final Formula IDENTITY;
+
+    static {
+        try {
+            IDENTITY = new Formula("f(x) = x");
+        } catch (ParseException e) {
+            throw new AssertionError(e);
+        }
+    }
+
     private interface Expression {
         float calculate(float x);
         

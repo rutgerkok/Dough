@@ -7,3 +7,7 @@ bootstrapper: nl.rutgerkok.doughworldgenerator.DoughBootstrap
 load: STARTUP
 author: Rutger Kok
 website: https://www.rutgerkok.nl/
+permissions:
+  dough.map:
+    description: "Gives access to the biome map of the server through the /dough map command."
+    default: op

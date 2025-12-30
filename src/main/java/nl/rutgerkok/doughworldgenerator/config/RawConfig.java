@@ -13,10 +13,19 @@ import java.util.List;
 public final class RawConfig {
 
 
-    private static final String DEFAULT = "DEFAULT";
+    public static final String DEFAULT = "DEFAULT";
 
-    private YamlConfiguration internalConfig;
-    private Path configPath;
+    private final YamlConfiguration internalConfig;
+    private final Path configPath;
+
+    /**
+     * Creates an empty config.
+     * @param configPath The config path, used for error messages only.
+     * @return The raw config.
+     */
+    public static RawConfig createEmpty(Path configPath) {
+        return new RawConfig(new YamlConfiguration(), configPath);
+    }
 
     /**
      * Loads the config from a file.
@@ -34,17 +43,49 @@ public final class RawConfig {
     }
 
     /**
+     * Reads a string from the config.
+     * @param key The config key.
+     * @param defaultValue The default value.
+     * @param comment The comment to add to the config file.
+     * @return The string, or the default value if the key is not set.
+     */
+    public String getString(String key, String defaultValue, String comment) {
+        String value = internalConfig.getString(key);
+        if (value == null) {
+            value = defaultValue;
+        }
+        internalConfig.set(key, value);
+        internalConfig.setComments(key, toMultilineComment(comment));
+        return value;
+    }
+
+    public int getInt(String key, int defaultValue, String comment) throws InvalidConfigException {
+        String stringValue = internalConfig.getString(key);
+        if (stringValue == null) {
+            stringValue = Integer.toString(defaultValue);
+        }
+        try {
+            int value = Integer.parseInt(stringValue);
+            internalConfig.set(key, value); // Update formatting
+            internalConfig.setComments(key, toMultilineComment(comment));
+            return value;
+        } catch (NumberFormatException e) {
+            throw new InvalidConfigException("Invalid integer number", this.configPath, key, stringValue, -1);
+        }
+    }
+
+    /**
      * Reads a formula from the config.
      * @param key The config key.
      * @param comment The comment to add to the config file.
      * @return The formula.
      * @throws InvalidConfigException If the formula stored in the config is invalid.
      */
-    public Formula getFormula(String key, String comment) throws InvalidConfigException{
+    public Formula getFormula(String key, Formula defaultValue, String comment) throws InvalidConfigException{
 
         String formulaString = internalConfig.getString(key);
         if (formulaString == null) {
-            formulaString = "f(x) = x"; // By default, we use the identity function
+            formulaString = defaultValue.toString();
         }
 
         try {
@@ -97,10 +138,9 @@ public final class RawConfig {
 
     /**
      * Saves the config to a file.
-     * @param file The file path.
      * @throws IOException If an I/O error occurs.
      */
-    public void save(Path file) throws IOException {
-        internalConfig.save(file.toFile());
+    public void saveToDisk() throws IOException {
+        internalConfig.save(this.configPath.toFile());
     }
 }

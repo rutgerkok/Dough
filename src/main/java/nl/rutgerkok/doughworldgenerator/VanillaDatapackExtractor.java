@@ -19,28 +19,12 @@ import java.util.List;
  */
 final class VanillaDatapackExtractor {
 
-    private static final String VERSION_INFO_YML = "version-info.yml";
-
     private final PluginLogger logger;
-    private final Path targetFolder;
     private final Path versionSpecificFolder;
-    private final String minecraftVersion;
 
-    public static @Nullable Path getVersionSpecificFolder(Path targetFolder) {
-        File configFile = targetFolder.resolve(VERSION_INFO_YML).toFile();
-        YamlConfiguration storageForMinecraftVersion = YamlConfiguration.loadConfiguration(configFile);
-        String minecraftVersion = storageForMinecraftVersion.getString("minecraft_version");
-        if (minecraftVersion == null) {
-            return null;
-        }
-        return targetFolder.resolve(minecraftVersion);
-    }
-
-    public VanillaDatapackExtractor(PluginLogger logger, Path targetFolder, String minecraftVersion) {
+    public VanillaDatapackExtractor(PluginLogger logger, Path versinSpecificFolder) {
         this.logger = logger;
-        this.targetFolder = targetFolder;
-        this.minecraftVersion = minecraftVersion;
-        this.versionSpecificFolder = targetFolder.resolve(minecraftVersion);
+        this.versionSpecificFolder = versinSpecificFolder;
     }
 
     private void cleanupGeneratedFolder() throws IOException {
@@ -78,9 +62,6 @@ final class VanillaDatapackExtractor {
      * @return True if the datapack is present or was successfully extracted, false if extraction failed.
      */
     public boolean extractIfNecessary() {
-        // Make sure this is always up to date with what the plugin is actually trying to read
-        storeMinecraftVersion(logger, minecraftVersion);
-
         if (!Files.exists(versionSpecificFolder)) {
             try {
                 generateVanillaDatapack();
@@ -116,22 +97,6 @@ final class VanillaDatapackExtractor {
             // Ignore
         }
         Runtime.getRuntime().halt(0);
-    }
-
-    private void storeMinecraftVersion(PluginLogger logger, String minecraftVersion) {
-        YamlConfiguration storageForMinecraftVersion = new YamlConfiguration();
-        storageForMinecraftVersion.set("minecraft_version", minecraftVersion);
-        storageForMinecraftVersion.setComments("minecraft_version", List.of(
-                "The Minecraft version for which the vanilla datapack was generated. ",
-                "The plugin cannot determine the Minecraft version at startup, so it reads it from here. ",
-                "Later in the startup process, this version is updated to the correct version.")
-        );
-        try {
-            Files.createDirectories(this.targetFolder);
-            storageForMinecraftVersion.save(this.targetFolder.resolve(VERSION_INFO_YML).toFile());
-        } catch (IOException e) {
-            logger.severe("Could not save version info for vanilla datapack:", e);
-        }
     }
 
 
