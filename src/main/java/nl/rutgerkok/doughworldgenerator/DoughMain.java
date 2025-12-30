@@ -61,7 +61,6 @@ public class DoughMain extends JavaPlugin implements MapViewProvider {
         Server server = getServer();
         MapView newMapView = server.createMap(server.getWorlds().getFirst());
         this.internalConfig.mapItemId = newMapView.getId();
-        saveInternalConfig();
         return newMapView;
     }
 
@@ -83,7 +82,7 @@ public class DoughMain extends JavaPlugin implements MapViewProvider {
         checkForDatapack();
 
         this.biomeGridUpdaters = new BiomeGridUpdaters(this, this);
-        this.biomeGridUpdaters.registerEvents();
+        this.biomeGridUpdaters.register();
     }
 
     @Override

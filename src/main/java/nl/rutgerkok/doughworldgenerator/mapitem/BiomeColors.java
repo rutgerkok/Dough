@@ -1,6 +1,7 @@
 package nl.rutgerkok.doughworldgenerator.mapitem;
 
 import org.bukkit.block.Biome;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class BiomeColors {
         addBiome(Biome.JUNGLE, rgb(83, 123, 9));
         // addBiome(Biome.JUNGLE_HILLS, rgb(44, 66, 5));
         addBiome(Biome.SPARSE_JUNGLE, rgb(98, 139, 23));
-        addBiome(Biome.DEEP_OCEAN, rgb(0, 0, 48));
+        addBiome(Biome.DEEP_OCEAN, rgb(0, 0, 80));
         addBiome(Biome.STONY_SHORE, rgb(162, 162, 132));
         addBiome(Biome.SNOWY_BEACH, rgb(250, 240, 192));
         addBiome(Biome.BIRCH_FOREST, rgb(48, 116, 68));
@@ -118,7 +119,10 @@ public class BiomeColors {
      * @param biome The biome.
      * @return The color, or black if unknown.
      */
-    public Color getAwtColor(Biome biome) {
+    public Color getAwtColor(@Nullable Biome biome) {
+        if (biome == null) {
+            return new Color(0, 0, 0, 0);
+        }
         return this.biomeColorMap.getOrDefault(biome, Color.BLACK);
     }
 

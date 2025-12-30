@@ -5,7 +5,6 @@ import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
 import org.bukkit.Input;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
 import org.jspecify.annotations.Nullable;
 
 import java.io.Closeable;
@@ -21,19 +20,19 @@ public class BiomeGridUpdater implements Closeable {
 
     public BiomeGridUpdater(Location location) {
         this.location = location;
-        this.biomeGrid = new BiomeGrid(location, 1);
+        this.scaleIndex = 2; // Default scale: 4x
+        this.biomeGrid = new BiomeGrid(location, SCALES[this.scaleIndex]);
     }
 
     BiomeGrid getBiomeGrid() {
         return biomeGrid;
     }
 
-    void handlePlayerInput(Input input, Plugin plugin) {
-        int scale = SCALES[scaleIndex];
-        AsyncScheduler scheduler = plugin.getServer().getAsyncScheduler();
+    void handlePlayerKeyPress(Input input, Plugin plugin) {
 
         if (input.isLeft() || input.isRight() || input.isForward() || input.isBackward()) {
             // Move
+            int scale = SCALES[scaleIndex];
             if (input.isLeft()) {
                 int deltaX = -scale * BiomeGrid.AXIS_LENGTH / 4;
                 location.add(deltaX, 0, 0);
@@ -66,11 +65,24 @@ public class BiomeGridUpdater implements Closeable {
         biomeGrid = new BiomeGrid(location, newScale);
 
         // Schedule map update
-        cancelAnyUpdateTask();
-        drawMap(plugin, scheduler);
+        redrawMapAsync(plugin);
     }
 
-    void drawMap(Plugin plugin, AsyncScheduler scheduler) {
+    /**
+     * Centers the map at the given location.
+     *
+     * @param location The location.
+     * @param plugin   The plugin, for scheduling the map update.
+     */
+    void centerMapAt(Location location, Plugin plugin) {
+        biomeGrid = new BiomeGrid(location, SCALES[scaleIndex]);
+        redrawMapAsync(plugin);
+    }
+
+    private void redrawMapAsync(Plugin plugin) {
+        cancelAnyUpdateTask();
+
+        AsyncScheduler scheduler = plugin.getServer().getAsyncScheduler();
         scheduler.runNow(plugin, task -> {
             this.mapUpdateTask = task;
             BiomeGridFillTask fillTask = new BiomeGridFillTask(biomeGrid, task);

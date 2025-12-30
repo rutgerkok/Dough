@@ -39,12 +39,11 @@ final class BiomeGridFillTask implements Runnable {
         int scaleFactor = biomeGrid.getScaleFactor();
         int blockY = startLocation.getBlockY();
 
-        biomeGrid.fill(Biome.OCEAN);
-        for (int x = 0; x < BiomeGrid.AXIS_LENGTH; x++) {
+        for (int z = 0; z < BiomeGrid.AXIS_LENGTH; z++) {
             if (task.isCancelled()) {
                 return;
             }
-            for (int z = 0; z < BiomeGrid.AXIS_LENGTH; z++) {
+            for (int x = 0; x < BiomeGrid.AXIS_LENGTH; x++) {
                 int blockX = startLocation.getBlockX() + x * scaleFactor;
                 int blockZ = startLocation.getBlockZ() + z * scaleFactor;
                 Biome biome = this.biomeProvider.getBiome(this.world, blockX, blockY, blockZ);
