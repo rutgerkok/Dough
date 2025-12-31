@@ -15,10 +15,21 @@ public class NoiseWriter {
     void writeNoiseFiles(Path outputFolder, WorldConfig config) throws IOException {
         Path noisesFolder = outputFolder.resolve(Path.of("data", "minecraft", "worldgen", "noise"));
         writeNoiseFile(noisesFolder, "continentalness", config.continentalnessNoise);
+        writeNoiseFile(noisesFolder, "continentalness_large", largeBiomes(config.continentalnessNoise));
         writeNoiseFile(noisesFolder, "erosion", config.erosionNoise);
-        writeNoiseFile(noisesFolder, "weirdness", config.weirdnessNoise);
+        writeNoiseFile(noisesFolder, "erosion_large", largeBiomes(config.erosionNoise));
         writeNoiseFile(noisesFolder, "temperature", config.temperatureNoise);
-        writeNoiseFile(noisesFolder, "humidity", config.humidityNoise);
+        writeNoiseFile(noisesFolder, "temperature_large", largeBiomes(config.temperatureNoise));
+        writeNoiseFile(noisesFolder, "vegetation", config.humidityNoise);
+        writeNoiseFile(noisesFolder, "vegetation_large", largeBiomes(config.humidityNoise));
+        writeNoiseFile(noisesFolder, "ridge", config.weirdnessNoise);
+    }
+
+    private @Nullable Noise largeBiomes(@Nullable Noise noise) {
+        if (noise == null) {
+            return null;
+        }
+        return new Noise(noise.amplitudes(), noise.firstOctave() - 2);
     }
 
     private void writeNoiseFile(Path noisesFolder, String noiseName, @Nullable Noise noiseValue) throws IOException {

@@ -40,15 +40,18 @@ public class WorldConfig {
                         " 'f(x) = sum(x, mul(0.2, gauss(x, -0.2, 0.3)))'");
         this.continentalnessNoise = rawConfig.getNoise("main_shape.continentalness.noise",
                 "Noise values for the continentalness, to increase/decrease bumpyness. If not set, the default Minecraft values are used." +
-                        " See https://misode.github.io/worldgen/noise/ for more information and presets.");
+                        " See https://misode.github.io/worldgen/noise/ for more information and presets. If the world is set to large biomes," +
+                        " the first octave is decreased by 2 automatically.");
         this.erosion = rawConfig.getFormula("main_shape.erosion.formula",  Formula.IDENTITY,"Adjustment for erosion noise.");
         this.erosionNoise = rawConfig.getNoise("main_shape.erosion.noise","Noise values for the erosion.");
         this.temperature = rawConfig.getFormula("main_shape.temperature.formula",  Formula.IDENTITY,"Adjustment for temperature noise.");
         this.temperatureNoise = rawConfig.getNoise("main_shape.temperature.noise", "Noise values for the temperature.");
         this.humidity = rawConfig.getFormula("main_shape.humidity.formula",  Formula.IDENTITY,"Adjustment for humidity noise.");
-        this.humidityNoise = rawConfig.getNoise("main_shape.humidity.noise", "Noise values for the humidity.");
+        this.humidityNoise = rawConfig.getNoise("main_shape.humidity.noise", "Noise values for the humidity." +
+                " Actually stored as \"vegetation\" in the noise settings folder of a datapack.");
         this.weirdness = rawConfig.getFormula("main_shape.weirdness.formula",  Formula.IDENTITY,"Adjustment for weirdness noise.");
-        this.weirdnessNoise = rawConfig.getNoise("main_shape.weirdness.noise", "Noise values for the weirdness.");
+        this.weirdnessNoise = rawConfig.getNoise("main_shape.weirdness.noise", "Noise values for the weirdness. Actually stored as \"ridge\"" +
+                " in the noise settings folder of a datapack. Unlike for these other noises, no changes are made for large biomes.");
     }
 
 
