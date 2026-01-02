@@ -22,9 +22,9 @@ final class VanillaDatapackExtractor {
     private final PluginLogger logger;
     private final Path versionSpecificFolder;
 
-    public VanillaDatapackExtractor(PluginLogger logger, Path versinSpecificFolder) {
+    public VanillaDatapackExtractor(PluginLogger logger, Path versionSpecificFolder) {
         this.logger = logger;
-        this.versionSpecificFolder = versinSpecificFolder;
+        this.versionSpecificFolder = versionSpecificFolder;
     }
 
     private void cleanupGeneratedFolder() throws IOException {

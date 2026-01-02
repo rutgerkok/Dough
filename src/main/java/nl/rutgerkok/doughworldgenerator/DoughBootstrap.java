@@ -7,11 +7,15 @@ import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import io.papermc.paper.plugin.configuration.PluginMeta;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.minecraft.SharedConstants;
+import net.minecraft.server.MinecraftServer;
 import nl.rutgerkok.doughworldgenerator.config.InvalidConfigException;
 import nl.rutgerkok.doughworldgenerator.config.PluginInternalConfig;
 import nl.rutgerkok.doughworldgenerator.config.WorldConfig;
 import nl.rutgerkok.doughworldgenerator.generator.DatapackGenerator;
 import nl.rutgerkok.doughworldgenerator.mapitem.MapCommand;
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.CraftServer;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
@@ -25,8 +29,11 @@ public class DoughBootstrap implements PluginBootstrap {
 
     @Override
     public void bootstrap(BootstrapContext context) {
+        String minecraftVersion = SharedConstants.getCurrentVersion().name();
+
         PluginLogger logger = new PluginLogger(context.getLogger());
-        PluginInternalConfig internalConfig = PluginInternalConfig.load(context.getDataDirectory(), logger);
+
+        logger.info("Minecraft version: " + minecraftVersion);
 
         // Load world config
         WorldConfig worldConfig = getWorldConfig(context, logger);
@@ -35,10 +42,10 @@ public class DoughBootstrap implements PluginBootstrap {
         }
 
         // Find previously extracted vanilla datapack
-        Path vanillaDatapackPath = getVanillaDatapackPath(context, internalConfig);
+        Path vanillaDatapackPath = getVanillaDatapackPath(context, minecraftVersion);
         if (vanillaDatapackPath == null) {
             logger.info("No vanilla datapack extracted yet, will do so later. Cannot apply custom world generation settings yet.");
-            return; // Vanilla datapack not yet extracted, cannot register our datapack
+            return; // Vanilla datapack not yet extracted, cannot register our datapack. Needs to be extracted in DoughMain, at this stage Minecraft would crash
         }
 
         // Generate our datapack
@@ -58,14 +65,10 @@ public class DoughBootstrap implements PluginBootstrap {
         registerCommands(context);
     }
 
-    private static @Nullable Path getVanillaDatapackPath(BootstrapContext context, PluginInternalConfig internalConfig) {
-        String minecraftVersion = internalConfig.minecraftVersion;
-        Path vanillaDatapackPath = null;
-        if (!internalConfig.minecraftVersion.isEmpty()) {
-            vanillaDatapackPath = context.getDataDirectory().resolve(Constants.VANILLA_DATAPACKS_FOLDER).resolve(minecraftVersion);
-            if (!Files.isDirectory(vanillaDatapackPath)) {
-                vanillaDatapackPath = null; // Not found
-            }
+    private static @Nullable Path getVanillaDatapackPath(BootstrapContext context, String minecraftVersion) {
+        Path vanillaDatapackPath = context.getDataDirectory().resolve(Constants.VANILLA_DATAPACKS_FOLDER).resolve(minecraftVersion);
+        if (!Files.isDirectory(vanillaDatapackPath)) {
+            return null; // Not found
         }
         return vanillaDatapackPath;
     }

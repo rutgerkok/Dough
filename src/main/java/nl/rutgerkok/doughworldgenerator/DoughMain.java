@@ -61,6 +61,7 @@ public class DoughMain extends JavaPlugin implements MapViewProvider {
         Server server = getServer();
         MapView newMapView = server.createMap(server.getWorlds().getFirst());
         this.internalConfig.mapItemId = newMapView.getId();
+        saveInternalConfig();
         return newMapView;
     }
 
@@ -68,10 +69,8 @@ public class DoughMain extends JavaPlugin implements MapViewProvider {
     public void onEnable() {
         this.logger = new PluginLogger(getComponentLogger());
 
-        // Read the config, update Minecraft version if necessary
+        // Read the config
         this.internalConfig = PluginInternalConfig.load(getDataPath(), logger);
-        this.internalConfig.minecraftVersion = getServer().getMinecraftVersion();
-        saveInternalConfig();
 
         VanillaDatapackExtractor extractor = new VanillaDatapackExtractor(logger, getVanillaDatapackPath());
         if (!extractor.extractIfNecessary()) {
@@ -97,7 +96,7 @@ public class DoughMain extends JavaPlugin implements MapViewProvider {
     }
 
     private Path getVanillaDatapackPath() {
-        return getDataPath().resolve(Constants.VANILLA_DATAPACKS_FOLDER).resolve(this.internalConfig.minecraftVersion);
+        return getDataPath().resolve(Constants.VANILLA_DATAPACKS_FOLDER).resolve(getServer().getMinecraftVersion());
     }
 
     private void checkForDatapack() {

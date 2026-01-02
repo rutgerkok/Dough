@@ -8,7 +8,6 @@ import java.nio.file.Path;
 
 public class PluginInternalConfig {
 
-    public String minecraftVersion = "";
     public int mapItemId = -1;
 
     public PluginInternalConfig() {
@@ -57,8 +56,6 @@ public class PluginInternalConfig {
      *            If the config contains invalid values (for example, a non-integer for an integer setting).
      */
     public void update(RawConfig config) throws InvalidConfigException {
-        this.minecraftVersion = config.getString("minecraft_version", minecraftVersion,
-                "The Minecraft version of the server. At startup, this version is not yet available, so we read it from here.");
         this.mapItemId = config.getInt("map_item_id", mapItemId,
                 "The map item ID (known as damage value before Minecraft 1.13) to use for the biome map item. If set to -1, a new map ID will be assigned automatically, and then this value will be updated.");
     }
