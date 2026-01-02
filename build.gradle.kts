@@ -1,11 +1,13 @@
 plugins {
     id("java")
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.19"
 }
 
 group = "nl.rutgerkok"
 version = "0.1-SNAPSHOT"
 description = "DoughWorldGenerator"
 java.sourceCompatibility = JavaVersion.VERSION_21
+paperweight.reobfArtifactConfiguration = io.papermc.paperweight.userdev.ReobfArtifactConfiguration.MOJANG_PRODUCTION
 
 repositories {
     mavenCentral()
@@ -15,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.papermc.paper:paper-api:1.21.11-R0.1-SNAPSHOT")
+    paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
