@@ -32,8 +32,7 @@ public class DoughBootstrap implements PluginBootstrap {
         String minecraftVersion = SharedConstants.getCurrentVersion().name();
 
         PluginLogger logger = new PluginLogger(context.getLogger());
-
-        logger.info("Minecraft version: " + minecraftVersion);
+        PluginInternalConfig internalConfig = PluginInternalConfig.load(context.getDataDirectory(), logger);
 
         // Load world config
         WorldConfig worldConfig = getWorldConfig(context, logger);
@@ -43,7 +42,7 @@ public class DoughBootstrap implements PluginBootstrap {
 
         // Find previously extracted vanilla datapack
         Path vanillaDatapackPath = getVanillaDatapackPath(context, minecraftVersion);
-        if (vanillaDatapackPath == null) {
+        if (vanillaDatapackPath == null || internalConfig.levelDatFile.isEmpty()) {
             logger.info("No vanilla datapack extracted yet, will do so later. Cannot apply custom world generation settings yet.");
             return; // Vanilla datapack not yet extracted, cannot register our datapack. Needs to be extracted in DoughMain, at this stage Minecraft would crash
         }
@@ -52,7 +51,7 @@ public class DoughBootstrap implements PluginBootstrap {
         Path datapackPath = context.getDataDirectory().resolve(Constants.GENERATED_DATAPACK_NAME);
         try {
             DatapackGenerator datapackGenerator = new DatapackGenerator(vanillaDatapackPath);
-            datapackGenerator.write(datapackPath, worldConfig);
+            datapackGenerator.write(datapackPath, Path.of(internalConfig.levelDatFile), worldConfig);
         } catch (IOException e) {
             logger.severe("Failed to generate datapack", e);
             return;

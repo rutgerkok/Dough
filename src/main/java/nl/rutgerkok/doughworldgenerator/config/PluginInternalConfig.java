@@ -9,6 +9,7 @@ import java.nio.file.Path;
 public class PluginInternalConfig {
 
     public int mapItemId = -1;
+    public String levelDatFile = "";
 
     public PluginInternalConfig() {
 
@@ -58,5 +59,7 @@ public class PluginInternalConfig {
     public void update(RawConfig config) throws InvalidConfigException {
         this.mapItemId = config.getInt("map_item_id", mapItemId,
                 "The map item ID (known as damage value before Minecraft 1.13) to use for the biome map item. If set to -1, a new map ID will be assigned automatically, and then this value will be updated.");
+        this.levelDatFile = config.getString("level_dat_file", levelDatFile,
+                "The path to the level.dat file of the main world. This file will be updated on server start so that the level preset settings can be applied to existing worlds.");
     }
 }

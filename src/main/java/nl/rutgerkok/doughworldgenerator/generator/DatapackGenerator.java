@@ -33,11 +33,11 @@ public final class DatapackGenerator {
         this.noiseWriter = new NoiseWriter();
     }
 
-    public void write(Path outputFolder, WorldConfig config) throws IOException {
+    public void write(Path outputFolder, Path levelDatFile, WorldConfig config) throws IOException {
         Files.createDirectories(outputFolder);
         writePackMcMeta(outputFolder);
 
-        this.worldPresetWriter.writeWorldPreset(outputFolder, config);
+        this.worldPresetWriter.writeWorldPreset(outputFolder, levelDatFile, config);
         this.noiseWriter.writeNoiseFiles(outputFolder, config);
         this.densityFunctionWriter.writeDensityFunction(outputFolder, config, "jaggedness");
         this.densityFunctionWriter.writeDensityFunction(outputFolder, config, "factor");
