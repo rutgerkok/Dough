@@ -9,6 +9,7 @@ import io.papermc.paper.plugin.configuration.PluginMeta;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.minecraft.SharedConstants;
 import net.minecraft.server.MinecraftServer;
+import nl.rutgerkok.doughworldgenerator.config.CacheKey;
 import nl.rutgerkok.doughworldgenerator.config.InvalidConfigException;
 import nl.rutgerkok.doughworldgenerator.config.PluginInternalConfig;
 import nl.rutgerkok.doughworldgenerator.config.WorldConfig;
@@ -49,12 +50,19 @@ public class DoughBootstrap implements PluginBootstrap {
 
         // Generate our datapack
         Path datapackPath = context.getDataDirectory().resolve(Constants.GENERATED_DATAPACK_NAME);
-        try {
-            DatapackGenerator datapackGenerator = new DatapackGenerator(vanillaDatapackPath);
-            datapackGenerator.write(datapackPath, Path.of(internalConfig.levelDatFile), worldConfig);
-        } catch (IOException e) {
-            logger.severe("Failed to generate datapack", e);
-            return;
+        String requiredCacheKey = CacheKey.generate(context.getPluginMeta(), worldConfig, minecraftVersion);
+        if (!internalConfig.cacheKey.equals(requiredCacheKey)) {
+            logger.info("Generating your custom datapack...");
+            try {
+                DatapackGenerator datapackGenerator = new DatapackGenerator(vanillaDatapackPath);
+                datapackGenerator.write(datapackPath, Path.of(internalConfig.levelDatFile), worldConfig);
+            } catch (IOException e) {
+                logger.severe("Failed to generate datapack", e);
+                return;
+            }
+            // Update cache key
+            internalConfig.cacheKey = requiredCacheKey;
+            internalConfig.save(context.getDataDirectory(), logger);
         }
 
         // Register datapack

@@ -1,10 +1,12 @@
 package nl.rutgerkok.doughworldgenerator.config;
 
+import com.google.common.hash.Hashing;
 import org.apache.commons.lang3.text.WordUtils;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jspecify.annotations.Nullable;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -40,6 +42,15 @@ public final class RawConfig {
     private RawConfig(YamlConfiguration internalConfig, Path configPath) {
         this.internalConfig = internalConfig;
         this.configPath = configPath;
+    }
+
+    /**
+     * Computes a cache key for this config, based on its contents.
+     * @return The cache key.
+     */
+    String computeCacheKey() {
+        // Using Murmur3 for speed - cryptographic hash is not needed here
+        return Hashing.murmur3_128().hashString(this.internalConfig.saveToString(), StandardCharsets.UTF_8).toString();
     }
 
     /**

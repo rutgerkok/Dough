@@ -31,6 +31,8 @@ public class WorldConfig {
     public final Formula weirdness;
     public final @Nullable Noise weirdnessNoise;
 
+    final String cacheKey;
+
     WorldConfig(RawConfig rawConfig) throws InvalidConfigException {
         this.continentalnessFormula = rawConfig.getFormula("main_shape.continentalness.formula", Formula.IDENTITY,
                 "Adjustment of continentalness for biomes and landmass. For example, use 'f(x) = sub(x, 0.1)' to subtract 0.1 from the" +
@@ -52,6 +54,8 @@ public class WorldConfig {
         this.weirdness = rawConfig.getFormula("main_shape.weirdness.formula",  Formula.IDENTITY,"Adjustment for weirdness noise.");
         this.weirdnessNoise = rawConfig.getNoise("main_shape.weirdness.noise", "Noise values for the weirdness. Actually stored as \"ridge\"" +
                 " in the noise settings folder of a datapack. Unlike for these other noises, no changes are made for large biomes.");
+
+        this.cacheKey = rawConfig.computeCacheKey();
     }
 
 
