@@ -14,7 +14,7 @@ public class BiomeGridUpdater implements Closeable {
     private static final int[] SCALES = {1, 2, 4, 8, 16, 32, 64, 128};
 
     private BiomeGrid biomeGrid;
-    private final Location location;
+    private Location location;
     private int scaleIndex;
     private @Nullable ScheduledTask mapUpdateTask;
 
@@ -22,6 +22,32 @@ public class BiomeGridUpdater implements Closeable {
         this.location = location;
         this.scaleIndex = 2; // Default scale: 4x
         this.biomeGrid = new BiomeGrid(location, SCALES[this.scaleIndex]);
+    }
+
+    private void cancelAnyUpdateTask() {
+        // We make a local copy, in case another thread sets it to null in between the null check and the cancel call
+        ScheduledTask task = this.mapUpdateTask;
+        if (task != null) {
+            task.cancel();
+            this.mapUpdateTask = null;
+        }
+    }
+
+    /**
+     * Centers the map at the given location.
+     *
+     * @param location The location.
+     * @param plugin   The plugin, for scheduling the map update.
+     */
+    void centerMapAt(Location location, Plugin plugin) {
+        this.location = location;
+
+        redrawMapAsync(plugin);
+    }
+
+    @Override
+    public void close() {
+        cancelAnyUpdateTask();
     }
 
     BiomeGrid getBiomeGrid() {
@@ -61,25 +87,12 @@ public class BiomeGridUpdater implements Closeable {
         }
 
         // Update biome grid
-        int newScale = SCALES[scaleIndex];
-        biomeGrid = new BiomeGrid(location, newScale);
-
-        // Schedule map update
-        redrawMapAsync(plugin);
-    }
-
-    /**
-     * Centers the map at the given location.
-     *
-     * @param location The location.
-     * @param plugin   The plugin, for scheduling the map update.
-     */
-    void centerMapAt(Location location, Plugin plugin) {
-        biomeGrid = new BiomeGrid(location, SCALES[scaleIndex]);
         redrawMapAsync(plugin);
     }
 
     private void redrawMapAsync(Plugin plugin) {
+        biomeGrid = new BiomeGrid(location, SCALES[scaleIndex]);
+
         cancelAnyUpdateTask();
 
         AsyncScheduler scheduler = plugin.getServer().getAsyncScheduler();
@@ -89,19 +102,5 @@ public class BiomeGridUpdater implements Closeable {
             fillTask.run();
             this.mapUpdateTask = null;
         });
-    }
-
-    @Override
-    public void close() {
-        cancelAnyUpdateTask();
-    }
-
-    private void cancelAnyUpdateTask() {
-        // We make a local copy, in case another thread sets it to null in between the null check and the cancel call
-        ScheduledTask task = this.mapUpdateTask;
-        if (task != null) {
-            task.cancel();
-            this.mapUpdateTask = null;
-        }
     }
 }
