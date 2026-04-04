@@ -1,16 +1,20 @@
 package nl.rutgerkok.doughworldgenerator;
 
 import io.papermc.paper.datapack.Datapack;
-import net.minecraft.world.level.Level;
+import net.minecraft.core.registries.Registries;
+import nl.rutgerkok.doughworldgenerator.config.InvalidConfigException;
 import nl.rutgerkok.doughworldgenerator.config.PluginInternalConfig;
+import nl.rutgerkok.doughworldgenerator.config.WorldConfig;
+import nl.rutgerkok.doughworldgenerator.generator.BiomeSourcePresetInjector;
 import nl.rutgerkok.doughworldgenerator.mapitem.BiomeGridUpdaters;
 import nl.rutgerkok.doughworldgenerator.mapitem.MapViewProvider;
+import org.bukkit.Registry;
 import org.bukkit.Server;
-import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.map.MapView;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.UnknownNullability;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 public class DoughMain extends JavaPlugin implements MapViewProvider {
@@ -71,9 +75,19 @@ public class DoughMain extends JavaPlugin implements MapViewProvider {
     public void onEnable() {
         this.logger = new PluginLogger(getComponentLogger());
 
+        // Inject biome source preset (that our datapack uses)
+        BiomeSourcePresetInjector injector = new BiomeSourcePresetInjector();
+        try {
+            WorldConfig worldConfig = WorldConfig.load(getDataPath().resolve(Constants.WORLD_CONFIG_FILE_NAME));
+            injector.inject(this.getServer(), worldConfig);
+        } catch (InvalidConfigException e) {
+            // Error message already logged in Bootstrap
+        } catch (IOException e) {
+            logger.severe("Failed to load world config, cannot inject biome source preset", e);
+        }
+
         // Read the config
         this.internalConfig = PluginInternalConfig.load(getDataPath(), logger);
-        updateLevelDatPath();
 
         VanillaDatapackExtractor extractor = new VanillaDatapackExtractor(logger, getVanillaDatapackPath());
         if (!extractor.extractIfNecessary() || !checkForDatapack()) {
@@ -85,17 +99,6 @@ public class DoughMain extends JavaPlugin implements MapViewProvider {
         this.biomeGridUpdaters.register();
     }
 
-    private void updateLevelDatPath() {
-        CraftServer craftServer = (CraftServer) getServer();
-        // Getting the path is based on craftServer.getWorldContainer()
-        Path levelDat = craftServer.getServer().storageSource.getDimensionPath(Level.OVERWORLD).resolve("level.dat");
-
-        if (!levelDat.toString().equals(this.internalConfig.levelDatFile)) {
-            // Save updated path to config
-            this.internalConfig.levelDatFile = levelDat.toString();
-            saveInternalConfig();
-        }
-    }
 
     @Override
     public void onDisable() {

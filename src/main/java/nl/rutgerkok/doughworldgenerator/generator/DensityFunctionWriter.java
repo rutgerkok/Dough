@@ -51,7 +51,7 @@ final class DensityFunctionWriter {
             Map<String, Object> pointMap = JsonUtil.castToMap(point);
             if (modifyContinentsLocation) {
                 float existingLocation = JsonUtil.getFloat(pointMap, "location");
-                pointMap.put("location", config.continentalnessFormula.evaluate(existingLocation));
+                pointMap.put("location", config.continentalness.evaluate(existingLocation));
             }
             if (modifyErosionLocation) {
                 float existingLocation = JsonUtil.getFloat(pointMap, "location");

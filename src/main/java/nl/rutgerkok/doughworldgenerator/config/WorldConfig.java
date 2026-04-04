@@ -20,7 +20,7 @@ public class WorldConfig {
         return worldConfig;
     }
 
-    public final Formula continentalnessFormula;
+    public final Formula continentalness;
     public final @Nullable Noise continentalnessNoise;
     public final Formula erosion;
     public final @Nullable Noise erosionNoise;
@@ -34,7 +34,7 @@ public class WorldConfig {
     final String cacheKey;
 
     WorldConfig(RawConfig rawConfig) throws InvalidConfigException {
-        this.continentalnessFormula = rawConfig.getFormula("main_shape.continentalness.formula", Formula.IDENTITY,
+        this.continentalness = rawConfig.getFormula("main_shape.continentalness.formula", Formula.IDENTITY,
                 "Adjustment of continentalness for biomes and landmass. For example, use 'f(x) = sub(x, 0.1)' to subtract 0.1 from the" +
                         " original value, making all biomes generate at lower continentalness, therefore generating more" +
                         " landmass. More complicated formulas are also possible. This example adds a little bump around -0.2," +

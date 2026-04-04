@@ -16,10 +16,9 @@ import static nl.rutgerkok.doughworldgenerator.util.JsonUtil.*;
 
 public final class DatapackGenerator {
 
-    public static final List<Integer> FORMAT_VERSION = List.of(94, 1); // Minecraft 1.21.11 uses version 94.1
+    public static final List<Integer> FORMAT_VERSION = List.of(101, 1); // Minecraft 26.1 uses version 101.1
 
     private final DensityFunctionWriter densityFunctionWriter;
-    private final WorldPresetWriter worldPresetWriter;
     private final NoiseWriter noiseWriter;
 
     /**
@@ -29,15 +28,13 @@ public final class DatapackGenerator {
      */
     public DatapackGenerator(Path vanillaDatapackPath) {
         this.densityFunctionWriter = new DensityFunctionWriter(vanillaDatapackPath);
-        this.worldPresetWriter = new WorldPresetWriter(vanillaDatapackPath);
         this.noiseWriter = new NoiseWriter();
     }
 
-    public void write(Path outputFolder, Path levelDatFile, WorldConfig config) throws IOException {
+    public void write(Path outputFolder, WorldConfig config) throws IOException {
         Files.createDirectories(outputFolder);
         writePackMcMeta(outputFolder);
 
-        this.worldPresetWriter.writeWorldPreset(outputFolder, levelDatFile, config);
         this.noiseWriter.writeNoiseFiles(outputFolder, config);
         this.densityFunctionWriter.writeDensityFunction(outputFolder, config, "jaggedness");
         this.densityFunctionWriter.writeDensityFunction(outputFolder, config, "factor");
