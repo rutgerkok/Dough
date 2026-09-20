@@ -29,7 +29,7 @@ public class NoiseWriter {
         if (noise == null) {
             return null;
         }
-        return new Noise(noise.amplitudes(), noise.firstOctave() - 2);
+        return new Noise(noise.amplitudeModifiers(), noise.baseOctave() - 2, noise.baseAmplitude());
     }
 
     private void writeNoiseFile(Path noisesFolder, String noiseName, @Nullable Noise noiseValue) throws IOException {
@@ -42,9 +42,10 @@ public class NoiseWriter {
             return;
         }
         Files.createDirectories(outputFile.getParent());
-        JsonUtil.writeJsonFile(outputFile, Map.of(
-                "amplitudes", noiseValue.amplitudes(),
-                "firstOctave", noiseValue.firstOctave()
+        JsonUtil.writeJsonFile(outputFile, Map.ofEntries(
+                Map.entry("amplitude_modifiers", noiseValue.amplitudeModifiers()),
+                Map.entry("base_octave", noiseValue.baseOctave()),
+                Map.entry("octave_count", noiseValue.amplitudeModifiers().length)
         ));
     }
 }

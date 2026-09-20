@@ -16,7 +16,7 @@ import static nl.rutgerkok.doughworldgenerator.util.JsonUtil.*;
 
 public final class DatapackGenerator {
 
-    public static final List<Integer> FORMAT_VERSION = List.of(101, 1); // Minecraft 26.1 uses version 101.1
+    public static final List<Integer> FORMAT_VERSION = List.of(121, 0); // Minecraft 26.3 uses version 121.0
 
     private final DensityFunctionWriter densityFunctionWriter;
     private final NoiseWriter noiseWriter;

@@ -110,26 +110,33 @@ public final class RawConfig {
     }
 
     public @Nullable Noise getNoise(String key, String comment) throws InvalidConfigException {
+        if (internalConfig.contains(key + ".first_octave")) {
+            // Update old config to new format
+            internalConfig.set(key + ".base_octave", internalConfig.getInt(key + ".first_octave"));
+            internalConfig.set(key + ".first_octave", null);
+        }
         boolean hasAmplitudes = internalConfig.contains(key + ".amplitudes") && !DEFAULT.equals(internalConfig.get(key + ".amplitudes"));
-        boolean hasFirstOctave = internalConfig.contains(key + ".first_octave") && !DEFAULT.equals(internalConfig.get(key + ".first_octave"));
+        boolean hasFirstOctave = internalConfig.contains(key + ".base_octave") && !DEFAULT.equals(internalConfig.get(key + ".base_octave"));
         if (!hasAmplitudes && !hasFirstOctave) {
             // Both values absent is fine
 
             // Still set comments and default values
             internalConfig.set(key + ".amplitudes", DEFAULT);
-            internalConfig.set(key + ".first_octave", DEFAULT);
+            internalConfig.set(key + ".base_octave", DEFAULT);
+            internalConfig.set(key + ".base_amplitude", DEFAULT);
             internalConfig.setComments(key, toMultilineComment(comment));
             return null;
         }
         if (!hasAmplitudes || !hasFirstOctave) {
-            throw new InvalidConfigException("Both amplitudes and first_octave must be set", this.configPath, key, "", -1);
+            throw new InvalidConfigException("Both amplitudes and base_octave must be set", this.configPath, key, "", -1);
         }
 
         // Update comments
         internalConfig.setComments(key, toMultilineComment(comment));
 
         List<Double> doubleList = internalConfig.getDoubleList(key + ".amplitudes");
-        int firstOctave = internalConfig.getInt(key + ".first_octave");
+        int baseOctave = internalConfig.getInt(key + ".base_octave");
+        double baseAmplitude = internalConfig.getDouble(key + ".base_amplitude", 0.8880832896205223);
 
         if (doubleList.isEmpty()) {
             throw new InvalidConfigException("Amplitudes list cannot be empty", this.configPath, key + ".amplitudes", "[]", 0);
@@ -138,7 +145,7 @@ public final class RawConfig {
         for (int i = 0; i < doubleList.size(); i++) {
             floatArray[i] = doubleList.get(i).floatValue();
         }
-        return new Noise(floatArray, firstOctave);
+        return new Noise(floatArray, baseOctave, baseAmplitude);
     }
 
     private List<String> toMultilineComment(String comment) {
