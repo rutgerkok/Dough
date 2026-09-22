@@ -2,6 +2,7 @@ package nl.rutgerkok.doughworldgenerator.config;
 
 import com.google.common.hash.Hashing;
 import org.apache.commons.lang3.text.WordUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.jspecify.annotations.Nullable;
 
@@ -112,7 +113,7 @@ public final class RawConfig {
     public @Nullable Noise getNoise(String key, String comment) throws InvalidConfigException {
         if (internalConfig.contains(key + ".first_octave")) {
             // Update old config to new format
-            internalConfig.set(key + ".base_octave", internalConfig.getInt(key + ".first_octave"));
+            internalConfig.set(key + ".base_octave", internalConfig.get(key + ".first_octave"));
             internalConfig.set(key + ".first_octave", null);
         }
         boolean hasAmplitudes = internalConfig.contains(key + ".amplitudes") && !DEFAULT.equals(internalConfig.get(key + ".amplitudes"));
