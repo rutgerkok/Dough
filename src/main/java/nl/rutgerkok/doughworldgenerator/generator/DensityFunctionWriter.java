@@ -37,8 +37,8 @@ final class DensityFunctionWriter {
         }
 
         // Else, try to find nested density functions
-        for (String key : new String[] { "argument", "argument1", "argument2" }) {
-            if (jsonContents.get(key) instanceof Map<?, ?> map) {
+        for (Map.Entry<String, Object> entry : jsonContents.entrySet()) {
+            if (entry.getValue() instanceof Map<?, ?> map) {
                 modifyDensityFunction(JsonUtil.castToMap(map), config);
             }
         }
